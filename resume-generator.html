@@ -1,0 +1,365 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Resume Generator - CareerAI</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-brain"></i>
+                <span>CareerAI</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="resume-generator.html" class="nav-item active">
+                <i class="fas fa-file-alt"></i>
+                <span>Resume Generator</span>
+            </a>
+            <a href="mock-interview.html" class="nav-item">
+                <i class="fas fa-comments"></i>
+                <span>Mock Interview</span>
+            </a>
+            <a href="career-insights.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Career Insights</span>
+            </a>
+            <a href="#profile" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>AI Resume Generator</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        <img src="/placeholder.svg?height=40&width=40" alt="User">
+                    </div>
+                    <span class="user-name">John Doe</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Resume Generator Content -->
+        <div class="resume-generator">
+            <!-- Progress Steps -->
+            <div class="steps-container">
+                <div class="steps">
+                    <div class="step active" data-step="1">
+                        <div class="step-number">1</div>
+                        <div class="step-info">
+                            <span class="step-title">Personal Info</span>
+                            <span class="step-desc">Basic contact information</span>
+                        </div>
+                    </div>
+                    <div class="step" data-step="2">
+                        <div class="step-number">2</div>
+                        <div class="step-info">
+                            <span class="step-title">Experience</span>
+                            <span class="step-desc">Work history and achievements</span>
+                        </div>
+                    </div>
+                    <div class="step" data-step="3">
+                        <div class="step-number">3</div>
+                        <div class="step-info">
+                            <span class="step-title">Skills & Education</span>
+                            <span class="step-desc">Technical skills and qualifications</span>
+                        </div>
+                    </div>
+                    <div class="step" data-step="4">
+                        <div class="step-number">4</div>
+                        <div class="step-info">
+                            <span class="step-title">Generated Resume</span>
+                            <span class="step-desc">Your AI-optimized resume</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 1: Personal Information -->
+            <div id="step-1" class="step-content active">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-user"></i> Personal Information</h2>
+                        <p>Enter your contact details and basic information</p>
+                    </div>
+                    <form class="resume-form">
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label for="fullName">Full Name</label>
+                                <input type="text" id="fullName" placeholder="John Doe" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="email">Email</label>
+                                <input type="email" id="email" placeholder="john@example.com" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="phone">Phone</label>
+                                <input type="tel" id="phone" placeholder="+1 (555) 123-4567" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="location">Location</label>
+                                <input type="text" id="location" placeholder="New York, NY" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="targetRole">Target Role</label>
+                                <input type="text" id="targetRole" placeholder="Software Engineer" required>
+                            </div>
+                            <div class="form-group">
+                                <label for="industry">Industry</label>
+                                <select id="industry" required>
+                                    <option value="">Select industry</option>
+                                    <option value="technology">Technology</option>
+                                    <option value="finance">Finance</option>
+                                    <option value="healthcare">Healthcare</option>
+                                    <option value="marketing">Marketing</option>
+                                    <option value="education">Education</option>
+                                    <option value="consulting">Consulting</option>
+                                </select>
+                            </div>
+                        </div>
+                        <div class="form-actions">
+                            <button type="button" class="btn btn-primary" onclick="nextStep()">Next Step</button>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <!-- Step 2: Experience -->
+            <div id="step-2" class="step-content">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-briefcase"></i> Work Experience</h2>
+                        <p>Add your work history and key achievements</p>
+                    </div>
+                    <div id="experience-container">
+                        <div class="experience-item">
+                            <div class="form-grid">
+                                <div class="form-group">
+                                    <label>Job Title</label>
+                                    <input type="text" placeholder="Senior Software Engineer">
+                                </div>
+                                <div class="form-group">
+                                    <label>Company</label>
+                                    <input type="text" placeholder="Tech Corp">
+                                </div>
+                                <div class="form-group">
+                                    <label>Start Date</label>
+                                    <input type="month">
+                                </div>
+                                <div class="form-group">
+                                    <label>End Date</label>
+                                    <input type="month">
+                                    <div class="checkbox-group">
+                                        <input type="checkbox" id="current-job">
+                                        <label for="current-job">Current Position</label>
+                                    </div>
+                                </div>
+                            </div>
+                            <div class="form-group">
+                                <label>Key Achievements</label>
+                                <textarea rows="4" placeholder="• Led a team of 5 developers to deliver a critical project 2 weeks ahead of schedule&#10;• Improved system performance by 40% through code optimization&#10;• Mentored junior developers and conducted code reviews"></textarea>
+                            </div>
+                        </div>
+                    </div>
+                    <button type="button" class="btn btn-secondary" onclick="addExperience()">
+                        <i class="fas fa-plus"></i> Add Experience
+                    </button>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn btn-primary" onclick="nextStep()">Next Step</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 3: Skills & Education -->
+            <div id="step-3" class="step-content">
+                <div class="form-card">
+                    <div class="card-header">
+                        <h2><i class="fas fa-graduation-cap"></i> Skills & Education</h2>
+                        <p>Add your technical skills and educational background</p>
+                    </div>
+                    <div class="skills-section">
+                        <h3>Technical Skills</h3>
+                        <div class="skills-input">
+                            <input type="text" id="skill-input" placeholder="Add a skill (e.g., React, Python, AWS)">
+                            <button type="button" class="btn btn-secondary" onclick="addSkill()">Add</button>
+                        </div>
+                        <div id="skills-container" class="skills-tags">
+                            <!-- Skills will be added here dynamically -->
+                        </div>
+                    </div>
+                    <div class="education-section">
+                        <h3>Education</h3>
+                        <div class="form-grid">
+                            <div class="form-group">
+                                <label>Degree</label>
+                                <input type="text" placeholder="Bachelor of Science">
+                            </div>
+                            <div class="form-group">
+                                <label>Field of Study</label>
+                                <input type="text" placeholder="Computer Science">
+                            </div>
+                            <div class="form-group">
+                                <label>University</label>
+                                <input type="text" placeholder="University of Technology">
+                            </div>
+                            <div class="form-group">
+                                <label>Graduation Year</label>
+                                <input type="number" placeholder="2018" min="1950" max="2030">
+                            </div>
+                        </div>
+                    </div>
+                    <div class="form-actions">
+                        <button type="button" class="btn btn-outline" onclick="prevStep()">Previous</button>
+                        <button type="button" class="btn btn-primary" onclick="generateResume()">
+                            <i class="fas fa-magic"></i> Generate Resume
+                        </button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Step 4: Generated Resume -->
+            <div id="step-4" class="step-content">
+                <div class="resume-result">
+                    <div class="result-header">
+                        <h2><i class="fas fa-check-circle"></i> Your AI-Generated Resume</h2>
+                        <p>Your resume has been optimized for ATS systems and tailored to your target role</p>
+                        <div class="result-actions">
+                            <button class="btn btn-primary">
+                                <i class="fas fa-download"></i> Download PDF
+                            </button>
+                            <button class="btn btn-secondary">
+                                <i class="fas fa-eye"></i> Preview
+                            </button>
+                            <button class="btn btn-outline">
+                                <i class="fas fa-edit"></i> Edit Resume
+                            </button>
+                        </div>
+                    </div>
+                    <div class="resume-preview">
+                        <div class="resume-document">
+                            <div class="resume-header">
+                                <h1>John Doe</h1>
+                                <p class="resume-title">Senior Software Engineer</p>
+                                <p class="resume-contact">john@example.com • +1 (555) 123-4567 • New York, NY</p>
+                            </div>
+                            <div class="resume-section">
+                                <h3>Professional Summary</h3>
+                                <p>Experienced Software Engineer with 5+ years of expertise in full-stack development, specializing in React, Node.js, and cloud technologies. Proven track record of leading cross-functional teams and delivering scalable solutions that improve system performance by up to 40%.</p>
+                            </div>
+                            <div class="resume-section">
+                                <h3>Technical Skills</h3>
+                                <div class="skills-list">
+                                    <span class="skill-tag">React</span>
+                                    <span class="skill-tag">Node.js</span>
+                                    <span class="skill-tag">Python</span>
+                                    <span class="skill-tag">AWS</span>
+                                    <span class="skill-tag">Docker</span>
+                                    <span class="skill-tag">MongoDB</span>
+                                    <span class="skill-tag">TypeScript</span>
+                                </div>
+                            </div>
+                            <div class="resume-section">
+                                <h3>Professional Experience</h3>
+                                <div class="experience-entry">
+                                    <div class="experience-header">
+                                        <div>
+                                            <h4>Senior Software Engineer</h4>
+                                            <p>Tech Corp</p>
+                                        </div>
+                                        <span class="date">Jan 2020 - Present</span>
+                                    </div>
+                                    <ul class="achievements">
+                                        <li>Led a team of 5 developers to deliver a critical project 2 weeks ahead of schedule</li>
+                                        <li>Improved system performance by 40% through code optimization and architecture redesign</li>
+                                        <li>Mentored junior developers and conducted comprehensive code reviews</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Loading State -->
+            <div id="loading-state" class="loading-state" style="display: none;">
+                <div class="loading-content">
+                    <div class="loading-spinner">
+                        <i class="fas fa-magic"></i>
+                    </div>
+                    <h3>AI is crafting your perfect resume...</h3>
+                    <div class="loading-progress">
+                        <div class="progress-bar">
+                            <div class="progress-fill"></div>
+                        </div>
+                        <p>Optimizing content for ATS systems and your target role</p>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chatbot -->
+    <div id="chatbot-container">
+        <div id="chatbot-toggle" class="chatbot-toggle">
+            <i class="fas fa-comments"></i>
+            <span class="chatbot-badge">AI</span>
+        </div>
+        <div id="chatbot-window" class="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="chatbot-info">
+                    <h4>Resume Assistant</h4>
+                    <span class="status online">Online</span>
+                </div>
+                <button id="chatbot-close" class="chatbot-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>I'm here to help you create the perfect resume! Need tips on any section?</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-message-input" placeholder="Ask about resume tips...">
+                <button id="chatbot-send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="chatbot.js"></script>
+</body>
+</html>

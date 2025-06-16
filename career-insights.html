@@ -1,0 +1,460 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Career Insights - CareerAI</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-brain"></i>
+                <span>CareerAI</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="resume-generator.html" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                <span>Resume Generator</span>
+            </a>
+            <a href="mock-interview.html" class="nav-item">
+                <i class="fas fa-comments"></i>
+                <span>Mock Interview</span>
+            </a>
+            <a href="career-insights.html" class="nav-item active">
+                <i class="fas fa-chart-line"></i>
+                <span>Career Insights</span>
+            </a>
+            <a href="#profile" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Career Insights</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="location-selector">
+                    <i class="fas fa-map-marker-alt"></i>
+                    <select id="location-select">
+                        <option value="san-francisco">San Francisco, CA</option>
+                        <option value="new-york">New York, NY</option>
+                        <option value="seattle">Seattle, WA</option>
+                        <option value="austin">Austin, TX</option>
+                    </select>
+                </div>
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        <img src="/placeholder.svg?height=40&width=40" alt="User">
+                    </div>
+                    <span class="user-name">John Doe</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Insights Content -->
+        <div class="insights-container">
+            <!-- Key Metrics -->
+            <div class="metrics-grid">
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-chart-line"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Job Market Growth</h3>
+                        <div class="metric-value positive">+18.5%</div>
+                        <div class="metric-trend">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>vs last quarter</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-dollar-sign"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Avg Salary</h3>
+                        <div class="metric-value">$118K</div>
+                        <div class="metric-trend positive">
+                            <i class="fas fa-arrow-up"></i>
+                            <span>+8% YoY</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-briefcase"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Open Positions</h3>
+                        <div class="metric-value">5,100</div>
+                        <div class="metric-trend">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <span>in your area</span>
+                        </div>
+                    </div>
+                </div>
+                <div class="metric-card">
+                    <div class="metric-icon">
+                        <i class="fas fa-target"></i>
+                    </div>
+                    <div class="metric-content">
+                        <h3>Skill Match</h3>
+                        <div class="metric-value">87%</div>
+                        <div class="metric-badge">
+                            <span>3 skills to improve</span>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Tabs Navigation -->
+            <div class="tabs-container">
+                <div class="tabs-nav">
+                    <button class="tab-btn active" data-tab="market-trends">Market Trends</button>
+                    <button class="tab-btn" data-tab="skills-demand">Skills in Demand</button>
+                    <button class="tab-btn" data-tab="personal-insights">Personal Insights</button>
+                    <button class="tab-btn" data-tab="weekly-updates">Weekly Updates</button>
+                </div>
+
+                <!-- Market Trends Tab -->
+                <div id="market-trends" class="tab-content active">
+                    <div class="trends-header">
+                        <h2><i class="fas fa-chart-line"></i> Job Market Trends</h2>
+                        <p>Current market analysis for top roles in San Francisco, CA</p>
+                    </div>
+                    <div class="trends-grid">
+                        <div class="trend-card">
+                            <div class="trend-header">
+                                <h3>Software Engineer</h3>
+                                <div class="trend-badges">
+                                    <span class="badge high-demand">High Demand</span>
+                                    <span class="trend-stat">
+                                        <i class="fas fa-briefcase"></i>
+                                        2,500 openings
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="trend-growth">
+                                <span class="growth-value">+15.5%</span>
+                                <span class="growth-label">growth</span>
+                            </div>
+                            <div class="trend-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Average Salary</span>
+                                    <span class="detail-value">$120,000</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Top Skills</span>
+                                    <div class="skills-tags">
+                                        <span class="skill-tag">React</span>
+                                        <span class="skill-tag">Node.js</span>
+                                        <span class="skill-tag">Python</span>
+                                        <span class="skill-tag">AWS</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="trend-card">
+                            <div class="trend-header">
+                                <h3>Data Scientist</h3>
+                                <div class="trend-badges">
+                                    <span class="badge high-demand">High Demand</span>
+                                    <span class="trend-stat">
+                                        <i class="fas fa-briefcase"></i>
+                                        1,200 openings
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="trend-growth">
+                                <span class="growth-value">+22.3%</span>
+                                <span class="growth-label">growth</span>
+                            </div>
+                            <div class="trend-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Average Salary</span>
+                                    <span class="detail-value">$110,000</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Top Skills</span>
+                                    <div class="skills-tags">
+                                        <span class="skill-tag">Python</span>
+                                        <span class="skill-tag">R</span>
+                                        <span class="skill-tag">SQL</span>
+                                        <span class="skill-tag">ML</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="trend-card">
+                            <div class="trend-header">
+                                <h3>DevOps Engineer</h3>
+                                <div class="trend-badges">
+                                    <span class="badge high-demand">High Demand</span>
+                                    <span class="trend-stat">
+                                        <i class="fas fa-briefcase"></i>
+                                        800 openings
+                                    </span>
+                                </div>
+                            </div>
+                            <div class="trend-growth">
+                                <span class="growth-value">+25.8%</span>
+                                <span class="growth-label">growth</span>
+                            </div>
+                            <div class="trend-details">
+                                <div class="detail-item">
+                                    <span class="detail-label">Average Salary</span>
+                                    <span class="detail-value">$115,000</span>
+                                </div>
+                                <div class="detail-item">
+                                    <span class="detail-label">Top Skills</span>
+                                    <div class="skills-tags">
+                                        <span class="skill-tag">Docker</span>
+                                        <span class="skill-tag">Kubernetes</span>
+                                        <span class="skill-tag">AWS</span>
+                                        <span class="skill-tag">CI/CD</span>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Skills in Demand Tab -->
+                <div id="skills-demand" class="tab-content">
+                    <div class="skills-header">
+                        <h2><i class="fas fa-fire"></i> Skills in High Demand</h2>
+                        <p>Trending skills with the highest job market growth</p>
+                    </div>
+                    <div class="skills-list">
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <h3>Artificial Intelligence</h3>
+                                <span class="skill-jobs">15,000 jobs</span>
+                            </div>
+                            <div class="skill-growth">
+                                <span class="growth-percent">+45%</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 45%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <h3>Cloud Computing</h3>
+                                <span class="skill-jobs">25,000 jobs</span>
+                            </div>
+                            <div class="skill-growth">
+                                <span class="growth-percent">+35%</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 35%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <h3>Cybersecurity</h3>
+                                <span class="skill-jobs">12,000 jobs</span>
+                            </div>
+                            <div class="skill-growth">
+                                <span class="growth-percent">+31%</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 31%"></div>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="skill-item">
+                            <div class="skill-info">
+                                <h3>Data Analysis</h3>
+                                <span class="skill-jobs">18,000 jobs</span>
+                            </div>
+                            <div class="skill-growth">
+                                <span class="growth-percent">+28%</span>
+                                <div class="skill-bar">
+                                    <div class="skill-progress" style="width: 28%"></div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Personal Insights Tab -->
+                <div id="personal-insights" class="tab-content">
+                    <div class="insights-grid">
+                        <div class="insight-card">
+                            <div class="insight-header">
+                                <h3><i class="fas fa-target"></i> Recommended Skills to Learn</h3>
+                                <span class="priority-badge high">High Priority</span>
+                            </div>
+                            <p>Based on your profile and target roles</p>
+                            <ul class="insight-list">
+                                <li><i class="fas fa-check"></i> Kubernetes</li>
+                                <li><i class="fas fa-check"></i> GraphQL</li>
+                                <li><i class="fas fa-check"></i> TypeScript</li>
+                            </ul>
+                            <button class="btn btn-primary">Start Learning</button>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-header">
+                                <h3><i class="fas fa-dollar-sign"></i> Salary Benchmark</h3>
+                                <span class="priority-badge medium">Medium Priority</span>
+                            </div>
+                            <p>You're earning 15% above market average</p>
+                            <ul class="insight-list">
+                                <li><i class="fas fa-info"></i> Market avg: $95k</li>
+                                <li><i class="fas fa-info"></i> Your range: $110k</li>
+                                <li><i class="fas fa-info"></i> Top 25%: $125k</li>
+                            </ul>
+                            <button class="btn btn-secondary">View Details</button>
+                        </div>
+                        <div class="insight-card">
+                            <div class="insight-header">
+                                <h3><i class="fas fa-route"></i> Next Career Steps</h3>
+                                <span class="priority-badge medium">Medium Priority</span>
+                            </div>
+                            <p>Recommended progression based on your experience</p>
+                            <ul class="insight-list">
+                                <li><i class="fas fa-arrow-right"></i> Senior Engineer</li>
+                                <li><i class="fas fa-arrow-right"></i> Tech Lead</li>
+                                <li><i class="fas fa-arrow-right"></i> Engineering Manager</li>
+                            </ul>
+                            <button class="btn btn-secondary">Explore Paths</button>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Weekly Updates Tab -->
+                <div id="weekly-updates" class="tab-content">
+                    <div class="updates-header">
+                        <h2><i class="fas fa-calendar"></i> Weekly Career Updates</h2>
+                        <p>Stay updated with the latest market changes and opportunities</p>
+                    </div>
+                    <div class="updates-timeline">
+                        <div class="update-week">
+                            <h3><i class="fas fa-calendar-day"></i> This Week</h3>
+                            <div class="update-items">
+                                <div class="update-item">
+                                    <i class="fas fa-arrow-up"></i>
+                                    <span>React job postings increased by 12% in your area</span>
+                                </div>
+                                <div class="update-item">
+                                    <i class="fas fa-building"></i>
+                                    <span>3 new companies are hiring for your skill set</span>
+                                </div>
+                                <div class="update-item">
+                                    <i class="fas fa-dollar-sign"></i>
+                                    <span>Average salary for your role increased by $2k</span>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="update-week">
+                            <h3><i class="fas fa-calendar-day"></i> Last Week</h3>
+                            <div class="update-items">
+                                <div class="update-item">
+                                    <i class="fas fa-code"></i>
+                                    <span>TypeScript demand grew 8% across tech companies</span>
+                                </div>
+                                <div class="update-item">
+                                    <i class="fas fa-home"></i>
+                                    <span>Remote work opportunities increased by 15%</span>
+                                </div>
+                                <div class="update-item">
+                                    <i class="fas fa-rocket"></i>
+                                    <span>5 new startups posted senior developer roles</span>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    <div class="recommended-actions">
+                        <h3>Recommended Actions</h3>
+                        <div class="actions-list">
+                            <div class="action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-book"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Learn TypeScript</h4>
+                                    <p>High demand growth this week</p>
+                                </div>
+                                <button class="btn btn-small">Start Learning</button>
+                            </div>
+                            <div class="action-item">
+                                <div class="action-icon">
+                                    <i class="fas fa-linkedin"></i>
+                                </div>
+                                <div class="action-content">
+                                    <h4>Update LinkedIn Profile</h4>
+                                    <p>3 recruiters viewed your profile</p>
+                                </div>
+                                <button class="btn btn-small btn-outline">Update Now</button>
+                            </div>
+                        </div>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chatbot -->
+    <div id="chatbot-container">
+        <div id="chatbot-toggle" class="chatbot-toggle">
+            <i class="fas fa-comments"></i>
+            <span class="chatbot-badge">AI</span>
+        </div>
+        <div id="chatbot-window" class="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="chatbot-info">
+                    <h4>Career Advisor</h4>
+                    <span class="status online">Online</span>
+                </div>
+                <button id="chatbot-close" class="chatbot-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>I can help you understand market trends and career opportunities. What would you like to know?</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-message-input" placeholder="Ask about career trends...">
+                <button id="chatbot-send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="chatbot.js"></script>
+</body>
+</html>

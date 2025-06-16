@@ -1,0 +1,325 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Mock Interview - CareerAI</title>
+    <link rel="stylesheet" href="styles.css">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.0.0/css/all.min.css" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap" rel="stylesheet">
+</head>
+<body class="dashboard-body">
+    <!-- Sidebar -->
+    <aside class="sidebar">
+        <div class="sidebar-header">
+            <div class="sidebar-logo">
+                <i class="fas fa-brain"></i>
+                <span>CareerAI</span>
+            </div>
+        </div>
+        <nav class="sidebar-nav">
+            <a href="dashboard.html" class="nav-item">
+                <i class="fas fa-home"></i>
+                <span>Dashboard</span>
+            </a>
+            <a href="resume-generator.html" class="nav-item">
+                <i class="fas fa-file-alt"></i>
+                <span>Resume Generator</span>
+            </a>
+            <a href="mock-interview.html" class="nav-item active">
+                <i class="fas fa-comments"></i>
+                <span>Mock Interview</span>
+            </a>
+            <a href="career-insights.html" class="nav-item">
+                <i class="fas fa-chart-line"></i>
+                <span>Career Insights</span>
+            </a>
+            <a href="#profile" class="nav-item">
+                <i class="fas fa-user"></i>
+                <span>Profile</span>
+            </a>
+        </nav>
+    </aside>
+
+    <!-- Main Content -->
+    <main class="main-content">
+        <!-- Top Bar -->
+        <header class="topbar">
+            <div class="topbar-left">
+                <button class="sidebar-toggle">
+                    <i class="fas fa-bars"></i>
+                </button>
+                <h1>Mock Interview Practice</h1>
+            </div>
+            <div class="topbar-right">
+                <div class="user-menu">
+                    <div class="user-avatar">
+                        <img src="/placeholder.svg?height=40&width=40" alt="User">
+                    </div>
+                    <span class="user-name">John Doe</span>
+                </div>
+            </div>
+        </header>
+
+        <!-- Interview Content -->
+        <div class="interview-container">
+            <!-- Interview Setup -->
+            <div id="interview-setup" class="interview-setup">
+                <div class="setup-header">
+                    <h2>Configure Your Mock Interview</h2>
+                    <p>Practice with AI-generated questions tailored to your target role</p>
+                </div>
+                
+                <div class="setup-form">
+                    <div class="form-grid">
+                        <div class="form-group">
+                            <label for="interview-type">Interview Type</label>
+                            <select id="interview-type" required>
+                                <option value="">Select interview type</option>
+                                <option value="technical">Technical Interview</option>
+                                <option value="behavioral">Behavioral Interview</option>
+                                <option value="case-study">Case Study Interview</option>
+                            </select>
+                        </div>
+                        <div class="form-group">
+                            <label for="target-role">Target Role</label>
+                            <select id="target-role" required>
+                                <option value="">Select target role</option>
+                                <option value="software-engineer">Software Engineer</option>
+                                <option value="data-scientist">Data Scientist</option>
+                                <option value="product-manager">Product Manager</option>
+                                <option value="ux-designer">UX Designer</option>
+                                <option value="devops-engineer">DevOps Engineer</option>
+                            </select>
+                        </div>
+                    </div>
+                    
+                    <div class="setup-actions">
+                        <button class="btn btn-primary btn-large" onclick="startInterview()">
+                            <i class="fas fa-play"></i> Start Interview
+                        </button>
+                    </div>
+                </div>
+
+                <!-- Interview Types Info -->
+                <div class="interview-types">
+                    <div class="type-card">
+                        <div class="type-icon">
+                            <i class="fas fa-code"></i>
+                        </div>
+                        <h3>Technical Interview</h3>
+                        <p>Test your technical knowledge and problem-solving skills</p>
+                        <ul>
+                            <li>Coding concepts and algorithms</li>
+                            <li>System design questions</li>
+                            <li>Technology-specific queries</li>
+                            <li>Best practices and patterns</li>
+                        </ul>
+                    </div>
+                    <div class="type-card">
+                        <div class="type-icon">
+                            <i class="fas fa-users"></i>
+                        </div>
+                        <h3>Behavioral Interview</h3>
+                        <p>Assess your soft skills and cultural fit</p>
+                        <ul>
+                            <li>Leadership and teamwork</li>
+                            <li>Problem-solving scenarios</li>
+                            <li>Communication skills</li>
+                            <li>Career motivation</li>
+                        </ul>
+                    </div>
+                    <div class="type-card">
+                        <div class="type-icon">
+                            <i class="fas fa-chart-bar"></i>
+                        </div>
+                        <h3>Case Study Interview</h3>
+                        <p>Evaluate your analytical and strategic thinking</p>
+                        <ul>
+                            <li>Business problem solving</li>
+                            <li>Strategic thinking</li>
+                            <li>Data analysis</li>
+                            <li>Recommendation frameworks</li>
+                        </ul>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interview Session -->
+            <div id="interview-session" class="interview-session" style="display: none;">
+                <div class="session-header">
+                    <div class="session-info">
+                        <span class="interview-badge" id="interview-badge">TECHNICAL INTERVIEW</span>
+                        <span class="question-counter">Question <span id="current-question">1</span> of <span id="total-questions">5</span></span>
+                    </div>
+                    <div class="session-timer">
+                        <i class="fas fa-clock"></i>
+                        <span id="timer">15:30</span>
+                    </div>
+                </div>
+
+                <div class="progress-container">
+                    <div class="progress-bar">
+                        <div class="progress-fill" id="interview-progress"></div>
+                    </div>
+                </div>
+
+                <div class="question-container">
+                    <div class="question-card">
+                        <h2 id="current-question-text">Explain the difference between let, const, and var in JavaScript.</h2>
+                        <p class="question-hint">Take your time to think through your answer. Speak clearly and provide specific examples.</p>
+                    </div>
+
+                    <div class="recording-controls">
+                        <button id="record-btn" class="btn btn-record">
+                            <i class="fas fa-microphone"></i>
+                            <span>Start Recording</span>
+                        </button>
+                        <button class="btn btn-secondary">
+                            <i class="fas fa-redo"></i>
+                            Restart Question
+                        </button>
+                    </div>
+
+                    <div id="recording-indicator" class="recording-indicator" style="display: none;">
+                        <div class="recording-dot"></div>
+                        <span>Recording in progress...</span>
+                    </div>
+
+                    <div class="answer-section">
+                        <label for="written-answer">Written Answer (Optional)</label>
+                        <textarea id="written-answer" rows="6" placeholder="You can also type your answer here for reference..."></textarea>
+                    </div>
+
+                    <div class="question-actions">
+                        <button class="btn btn-outline" onclick="prevQuestion()" id="prev-btn">Previous Question</button>
+                        <button class="btn btn-primary" onclick="nextQuestion()" id="next-btn">Next Question</button>
+                    </div>
+                </div>
+            </div>
+
+            <!-- Interview Results -->
+            <div id="interview-results" class="interview-results" style="display: none;">
+                <div class="results-header">
+                    <div class="results-icon">
+                        <i class="fas fa-check-circle"></i>
+                    </div>
+                    <h2>Interview Complete!</h2>
+                    <p>Here's your performance analysis and recommendations for improvement</p>
+                </div>
+
+                <div class="overall-score">
+                    <div class="score-circle">
+                        <svg class="score-svg" width="120" height="120">
+                            <circle class="score-bg" cx="60" cy="60" r="50"></circle>
+                            <circle class="score-progress" cx="60" cy="60" r="50"></circle>
+                        </svg>
+                        <div class="score-text">85</div>
+                    </div>
+                    <h3>Overall Interview Score</h3>
+                </div>
+
+                <div class="results-grid">
+                    <div class="results-card">
+                        <h3><i class="fas fa-thumbs-up"></i> Strengths</h3>
+                        <ul class="strengths-list">
+                            <li><i class="fas fa-check"></i> Clear and concise communication</li>
+                            <li><i class="fas fa-check"></i> Strong technical knowledge</li>
+                            <li><i class="fas fa-check"></i> Good problem-solving approach</li>
+                        </ul>
+                    </div>
+                    <div class="results-card">
+                        <h3><i class="fas fa-lightbulb"></i> Areas for Improvement</h3>
+                        <ul class="improvements-list">
+                            <li><i class="fas fa-arrow-up"></i> Provide more specific examples</li>
+                            <li><i class="fas fa-arrow-up"></i> Structure answers using STAR method</li>
+                            <li><i class="fas fa-arrow-up"></i> Show more enthusiasm for the role</li>
+                        </ul>
+                    </div>
+                </div>
+
+                <div class="detailed-scores">
+                    <h3>Detailed Performance</h3>
+                    <div class="score-breakdown">
+                        <div class="score-item">
+                            <span>Technical Knowledge</span>
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: 90%"></div>
+                            </div>
+                            <span class="score-value">90%</span>
+                        </div>
+                        <div class="score-item">
+                            <span>Problem Solving</span>
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="score-value">85%</span>
+                        </div>
+                        <div class="score-item">
+                            <span>Communication</span>
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: 80%"></div>
+                            </div>
+                            <span class="score-value">80%</span>
+                        </div>
+                        <div class="score-item">
+                            <span>Cultural Fit</span>
+                            <div class="score-bar">
+                                <div class="score-fill" style="width: 85%"></div>
+                            </div>
+                            <span class="score-value">85%</span>
+                        </div>
+                    </div>
+                </div>
+
+                <div class="results-actions">
+                    <button class="btn btn-primary" onclick="startNewInterview()">Start New Interview</button>
+                    <button class="btn btn-secondary">Download Report</button>
+                    <button class="btn btn-outline">Share Results</button>
+                </div>
+            </div>
+        </div>
+    </main>
+
+    <!-- AI Chatbot -->
+    <div id="chatbot-container">
+        <div id="chatbot-toggle" class="chatbot-toggle">
+            <i class="fas fa-comments"></i>
+            <span class="chatbot-badge">AI</span>
+        </div>
+        <div id="chatbot-window" class="chatbot-window">
+            <div class="chatbot-header">
+                <div class="chatbot-avatar">
+                    <i class="fas fa-robot"></i>
+                </div>
+                <div class="chatbot-info">
+                    <h4>Interview Coach</h4>
+                    <span class="status online">Online</span>
+                </div>
+                <button id="chatbot-close" class="chatbot-close">
+                    <i class="fas fa-times"></i>
+                </button>
+            </div>
+            <div id="chatbot-messages" class="chatbot-messages">
+                <div class="message bot-message">
+                    <div class="message-avatar">
+                        <i class="fas fa-robot"></i>
+                    </div>
+                    <div class="message-content">
+                        <p>Ready to practice your interview skills? I can help you prepare!</p>
+                    </div>
+                </div>
+            </div>
+            <div class="chatbot-input">
+                <input type="text" id="chatbot-message-input" placeholder="Ask about interview tips...">
+                <button id="chatbot-send">
+                    <i class="fas fa-paper-plane"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+
+    <script src="script.js"></script>
+    <script src="chatbot.js"></script>
+</body>
+</html>
