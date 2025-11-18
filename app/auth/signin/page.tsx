@@ -7,12 +7,13 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Brain, Eye, EyeOff } from "lucide-react"
+import { Brain, Eye, EyeOff } from 'lucide-react'
 import Link from "next/link"
-import { useRouter } from "next/navigation"
+import { useRouter } from 'next/navigation'
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
+  const [name, setName] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -22,8 +23,18 @@ export default function SignInPage() {
     e.preventDefault()
     setIsLoading(true)
 
-    // Simulate authentication
     setTimeout(() => {
+      // Store user data in localStorage with the name provided by user
+      const userData = {
+        email: email,
+        name: name || email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+        joinDate: new Date().toISOString(),
+        profileComplete: false,
+        lastLogin: new Date().toISOString(),
+      }
+
+      localStorage.setItem("currentUser", JSON.stringify(userData))
+
       setIsLoading(false)
       router.push("/dashboard")
     }, 1500)
@@ -42,6 +53,17 @@ export default function SignInPage() {
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignIn} className="space-y-4">
+            <div className="space-y-2">
+              <Label htmlFor="name">Full Name</Label>
+              <Input
+                id="name"
+                type="text"
+                placeholder="Enter your full name"
+                value={name}
+                onChange={(e) => setName(e.target.value)}
+                required
+              />
+            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
