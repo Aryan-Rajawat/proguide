@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { BarChart3, Brain, FileText, Home, LogOut, MessageSquare, Settings, User } from 'lucide-react'
+import { BarChart3, Brain, FileText, Home, LogOut, MessageSquare, Settings, User, Briefcase } from 'lucide-react'
 import Link from "next/link"
 import { useRouter, usePathname } from 'next/navigation'
 
@@ -62,6 +62,7 @@ export default function DashboardLayout({
     { name: "Resume Manager", href: "/resume-manager", icon: FileText },
     { name: "Mock Interview", href: "/mock-interview", icon: MessageSquare },
     { name: "Career Insights", href: "/career-insights", icon: BarChart3 },
+    { name: "Jobs", href: "/jobs", icon: Briefcase },
   ]
 
   if (!userData) {

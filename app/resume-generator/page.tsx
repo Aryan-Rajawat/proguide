@@ -165,13 +165,13 @@ export default function ResumeGeneratorPage() {
     
     const text = generateResumeText(generatedResume)
     const element = document.createElement("a")
-    const file = new Blob([text], { type: "text/plain" })
+    const file = new Blob([text], { type: "text/plain;charset=utf-8" })
     element.href = URL.createObjectURL(file)
     element.download = `${generatedResume.personalInfo.fullName || "Resume"}.txt`
     document.body.appendChild(element)
     element.click()
-    URL.revokeObjectURL(element.href)
     document.body.removeChild(element)
+    URL.revokeObjectURL(element.href)
   }
 
   const downloadPDF = () => {
@@ -179,13 +179,13 @@ export default function ResumeGeneratorPage() {
     
     const text = generateResumeText(generatedResume)
     const element = document.createElement("a")
-    const file = new Blob([text], { type: "application/pdf" })
+    const file = new Blob([text], { type: "text/plain;charset=utf-8" })
     element.href = URL.createObjectURL(file)
-    element.download = `${generatedResume.personalInfo.fullName || "Resume"}.pdf`
+    element.download = `${generatedResume.personalInfo.fullName || "Resume"}.txt`
     document.body.appendChild(element)
     element.click()
-    URL.revokeObjectURL(element.href)
     document.body.removeChild(element)
+    URL.revokeObjectURL(element.href)
   }
 
   const steps = [

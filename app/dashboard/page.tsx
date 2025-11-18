@@ -96,7 +96,9 @@ export default function DashboardPage() {
                 <span>60%</span>
               </div>
               <Progress value={60} className="h-2" />
-              <Button className="w-full bg-orange-600 hover:bg-orange-700">Complete Profile</Button>
+              <Link href="/profile">
+                <Button className="w-full bg-orange-600 hover:bg-orange-700">Complete Profile</Button>
+              </Link>
             </div>
           </CardContent>
         </Card>
@@ -226,10 +228,12 @@ export default function DashboardPage() {
                     View Insights
                   </Button>
                 </Link>
-                <Button variant="outline" className="w-full h-20 flex-col gap-2 bg-transparent">
-                  <Briefcase className="w-6 h-6" />
-                  Find Jobs
-                </Button>
+                <Link href="/jobs">
+                  <Button variant="outline" className="w-full h-20 flex-col gap-2 bg-transparent">
+                    <Briefcase className="w-6 h-6" />
+                    Find Jobs
+                  </Button>
+                </Link>
               </div>
             </CardContent>
           </Card>
