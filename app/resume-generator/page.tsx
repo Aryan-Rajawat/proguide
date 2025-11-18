@@ -167,9 +167,10 @@ export default function ResumeGeneratorPage() {
     const element = document.createElement("a")
     const file = new Blob([text], { type: "text/plain" })
     element.href = URL.createObjectURL(file)
-    element.download = `${generatedResume.targetRole || "Resume"}.txt`
+    element.download = `${generatedResume.personalInfo.fullName || "Resume"}.txt`
     document.body.appendChild(element)
     element.click()
+    URL.revokeObjectURL(element.href)
     document.body.removeChild(element)
   }
 
@@ -178,11 +179,12 @@ export default function ResumeGeneratorPage() {
     
     const text = generateResumeText(generatedResume)
     const element = document.createElement("a")
-    const file = new Blob([text], { type: "text/plain" })
+    const file = new Blob([text], { type: "application/pdf" })
     element.href = URL.createObjectURL(file)
-    element.download = `${generatedResume.targetRole || "Resume"}.pdf`
+    element.download = `${generatedResume.personalInfo.fullName || "Resume"}.pdf`
     document.body.appendChild(element)
     element.click()
+    URL.revokeObjectURL(element.href)
     document.body.removeChild(element)
   }
 
@@ -368,7 +370,7 @@ export default function ResumeGeneratorPage() {
                 <div className="space-y-2">
                   <Label>Key Achievements</Label>
                   <Textarea
-                    placeholder="• Led a team of 5 developers to deliver a critical project 2 weeks ahead of schedule&#10;• Improved system performance by 40% through code optimization&#10;• Mentored junior developers and conducted code reviews"
+                    placeholder="• Led a team of 5 developers to deliver a critical project 2 weeks ahead of schedule\n• Improved system performance by 40% through code optimization\n• Mentored junior developers and conducted code reviews"
                     rows={4}
                     value={exp.description}
                     onChange={(e) => updateExperience(index, "description", e.target.value)}
