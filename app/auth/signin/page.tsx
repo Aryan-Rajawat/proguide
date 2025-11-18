@@ -7,7 +7,7 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Brain, Eye, EyeOff } from 'lucide-react'
+import { Brain, Eye, EyeOff, AlertCircle } from 'lucide-react'
 import Link from "next/link"
 import { useRouter } from 'next/navigation'
 
@@ -17,14 +17,50 @@ export default function SignInPage() {
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
+  const [passwordError, setPasswordError] = useState("")
   const router = useRouter()
+
+  const validatePassword = (pwd: string): boolean => {
+    const hasUpperCase = /[A-Z]/.test(pwd)
+    const hasLowerCase = /[a-z]/.test(pwd)
+    const hasNumber = /[0-9]/.test(pwd)
+    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)
+    const isLongEnough = pwd.length >= 8
+
+    if (!isLongEnough) {
+      setPasswordError("Password must be at least 8 characters long")
+      return false
+    }
+    if (!hasUpperCase) {
+      setPasswordError("Password must contain at least one uppercase letter")
+      return false
+    }
+    if (!hasLowerCase) {
+      setPasswordError("Password must contain at least one lowercase letter")
+      return false
+    }
+    if (!hasNumber) {
+      setPasswordError("Password must contain at least one number")
+      return false
+    }
+    if (!hasSpecialChar) {
+      setPasswordError("Password must contain at least one special character (!@#$%^&*)")
+      return false
+    }
+    setPasswordError("")
+    return true
+  }
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
+    
+    if (!validatePassword(password)) {
+      return
+    }
+
     setIsLoading(true)
 
     setTimeout(() => {
-      // Store user data in localStorage with the name provided by user
       const userData = {
         email: email,
         name: name || email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
@@ -76,14 +112,22 @@ export default function SignInPage() {
               />
             </div>
             <div className="space-y-2">
-              <Label htmlFor="password">Password</Label>
+              <div className="flex justify-between items-center">
+                <Label htmlFor="password">Password</Label>
+                <Link href="/auth/forgot-password" className="text-xs text-blue-600 hover:underline">
+                  Forgot password?
+                </Link>
+              </div>
               <div className="relative">
                 <Input
                   id="password"
                   type={showPassword ? "text" : "password"}
                   placeholder="Enter your password"
                   value={password}
-                  onChange={(e) => setPassword(e.target.value)}
+                  onChange={(e) => {
+                    setPassword(e.target.value)
+                    setPasswordError("")
+                  }}
                   required
                 />
                 <Button
@@ -96,8 +140,14 @@ export default function SignInPage() {
                   {showPassword ? <EyeOff className="w-4 h-4" /> : <Eye className="w-4 h-4" />}
                 </Button>
               </div>
+              {passwordError && (
+                <div className="flex items-gap-2 p-2 bg-red-50 rounded border border-red-200">
+                  <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
+                  <p className="text-xs text-red-600">{passwordError}</p>
+                </div>
+              )}
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading}>
+            <Button type="submit" className="w-full" disabled={isLoading || !!passwordError}>
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>

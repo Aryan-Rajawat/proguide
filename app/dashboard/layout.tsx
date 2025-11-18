@@ -13,9 +13,9 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { BarChart3, Brain, FileText, Home, LogOut, MessageSquare, Settings, User } from "lucide-react"
+import { BarChart3, Brain, FileText, Home, LogOut, MessageSquare, Settings, User } from 'lucide-react'
 import Link from "next/link"
-import { useRouter, usePathname } from "next/navigation"
+import { useRouter, usePathname } from 'next/navigation'
 
 interface UserData {
   email: string
@@ -35,12 +35,10 @@ export default function DashboardLayout({
   const pathname = usePathname()
 
   useEffect(() => {
-    // Get user data from localStorage
     const storedUser = localStorage.getItem("currentUser")
     if (storedUser) {
       setUserData(JSON.parse(storedUser))
     } else {
-      // Redirect to sign in if no user data
       router.push("/auth/signin")
     }
   }, [router])
@@ -61,6 +59,7 @@ export default function DashboardLayout({
   const navigation = [
     { name: "Dashboard", href: "/dashboard", icon: Home },
     { name: "Resume Generator", href: "/resume-generator", icon: FileText },
+    { name: "Resume Manager", href: "/resume-manager", icon: FileText },
     { name: "Mock Interview", href: "/mock-interview", icon: MessageSquare },
     { name: "Career Insights", href: "/career-insights", icon: BarChart3 },
   ]
@@ -75,17 +74,14 @@ export default function DashboardLayout({
 
   return (
     <div className="min-h-screen bg-gray-50">
-      {/* Header */}
       <header className="bg-white shadow-sm border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
-            {/* Logo */}
             <div className="flex items-center gap-2">
               <Brain className="w-8 h-8 text-blue-600" />
               <span className="text-xl font-bold text-gray-900">CareerAI</span>
             </div>
 
-            {/* Navigation */}
             <nav className="hidden md:flex space-x-8">
               {navigation.map((item) => {
                 const isActive = pathname === item.href
@@ -104,7 +100,6 @@ export default function DashboardLayout({
               })}
             </nav>
 
-            {/* User Menu */}
             <DropdownMenu>
               <DropdownMenuTrigger asChild>
                 <Button variant="ghost" className="relative h-10 w-10 rounded-full">
@@ -140,7 +135,6 @@ export default function DashboardLayout({
         </div>
       </header>
 
-      {/* Mobile Navigation */}
       <nav className="md:hidden bg-white border-b">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex space-x-4 py-3 overflow-x-auto">
@@ -163,7 +157,6 @@ export default function DashboardLayout({
         </div>
       </nav>
 
-      {/* Main Content */}
       <main className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">{children}</main>
     </div>
   )
