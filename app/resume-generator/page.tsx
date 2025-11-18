@@ -28,6 +28,7 @@ export default function ResumeGeneratorPage() {
     experience: [],
     education: [],
     skills: [],
+    professionalSummary: "",
   })
   const [generatedResume, setGeneratedResume] = useState<typeof formData | null>(null)
 
@@ -62,8 +63,10 @@ export default function ResumeGeneratorPage() {
     text += `${data.personalInfo.email} • ${data.personalInfo.phone} • ${data.personalInfo.location}\n\n`
     
     // Professional summary
-    text += "PROFESSIONAL SUMMARY\n"
-    text += `Experienced ${data.targetRole} with expertise in ${data.skills.slice(0, 3).join(", ")}. Seeking to leverage skills in ${data.industry}.\n\n`
+    if (data.professionalSummary) {
+      text += "PROFESSIONAL SUMMARY\n"
+      text += data.professionalSummary + "\n\n"
+    }
     
     // Technical skills
     text += "TECHNICAL SKILLS\n"
@@ -391,10 +394,26 @@ export default function ResumeGeneratorPage() {
       {currentStep === 3 && (
         <Card>
           <CardHeader>
-            <CardTitle>Skills & Education</CardTitle>
-            <CardDescription>Add your technical skills and educational background</CardDescription>
+            <CardTitle>Professional Summary & Skills</CardTitle>
+            <CardDescription>Add your professional summary, technical skills and educational background</CardDescription>
           </CardHeader>
           <CardContent className="space-y-6">
+            <div className="space-y-2">
+              <Label htmlFor="professionalSummary">Professional Summary</Label>
+              <Textarea
+                id="professionalSummary"
+                placeholder="Write your professional summary (this will be displayed in your resume)"
+                rows={4}
+                value={formData.professionalSummary || ""}
+                onChange={(e) =>
+                  setFormData((prev) => ({
+                    ...prev,
+                    professionalSummary: e.target.value,
+                  }))
+                }
+              />
+            </div>
+
             <div className="space-y-4">
               <Label>Technical Skills</Label>
               <div className="flex flex-wrap gap-2 mb-4">
@@ -538,12 +557,12 @@ export default function ResumeGeneratorPage() {
                 </div>
 
                 <div className="space-y-6">
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Professional Summary</h3>
-                    <p className="text-gray-700">
-                      Experienced {generatedResume.targetRole} with expertise in {generatedResume.skills.slice(0, 3).join(", ")}. Seeking to leverage my skills in the {generatedResume.industry} industry.
-                    </p>
-                  </div>
+                  {generatedResume.professionalSummary && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Professional Summary</h3>
+                      <p className="text-gray-700">{generatedResume.professionalSummary}</p>
+                    </div>
+                  )}
 
                   {generatedResume.skills.length > 0 && (
                     <div>
