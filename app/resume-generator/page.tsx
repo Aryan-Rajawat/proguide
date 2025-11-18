@@ -9,7 +9,7 @@ import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
-import { FileText, Download, Eye, Sparkles, Plus, X } from "lucide-react"
+import { FileText, Download, Eye, Sparkles, Plus, X } from 'lucide-react'
 
 export default function ResumeGeneratorPage() {
   const [currentStep, setCurrentStep] = useState(1)
@@ -29,14 +29,70 @@ export default function ResumeGeneratorPage() {
     education: [],
     skills: [],
   })
+  const [generatedResume, setGeneratedResume] = useState<typeof formData | null>(null)
 
   const handleGenerate = async () => {
     setIsGenerating(true)
     // Simulate AI generation
     setTimeout(() => {
+      setGeneratedResume({ ...formData })
       setIsGenerating(false)
       setCurrentStep(4)
+      
+      const resumes = JSON.parse(localStorage.getItem("resumes") || "[]")
+      const newResume = {
+        id: Date.now().toString(),
+        title: formData.targetRole ? `${formData.targetRole} Resume` : "My Resume",
+        content: generateResumeText(formData),
+        formData: formData,
+        createdDate: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      }
+      resumes.push(newResume)
+      localStorage.setItem("resumes", JSON.stringify(resumes))
     }, 3000)
+  }
+
+  const generateResumeText = (data: typeof formData): string => {
+    let text = ""
+    
+    // Personal info
+    text += data.personalInfo.fullName.toUpperCase() + "\n"
+    text += data.targetRole + "\n"
+    text += `${data.personalInfo.email} • ${data.personalInfo.phone} • ${data.personalInfo.location}\n\n`
+    
+    // Professional summary
+    text += "PROFESSIONAL SUMMARY\n"
+    text += `Experienced ${data.targetRole} with expertise in ${data.skills.slice(0, 3).join(", ")}. Seeking to leverage skills in ${data.industry}.\n\n`
+    
+    // Technical skills
+    text += "TECHNICAL SKILLS\n"
+    text += data.skills.join(", ") + "\n\n"
+    
+    // Experience
+    if (data.experience.length > 0) {
+      text += "PROFESSIONAL EXPERIENCE\n"
+      data.experience.forEach((exp: any) => {
+        if (exp.title || exp.company) {
+          text += `${exp.title} - ${exp.company}\n`
+          text += `${exp.duration}\n`
+          text += `${exp.description}\n\n`
+        }
+      })
+    }
+    
+    // Education
+    if (data.education.length > 0) {
+      text += "EDUCATION\n"
+      data.education.forEach((edu: any) => {
+        if (edu.degree || edu.university) {
+          text += `${edu.degree} in ${edu.fieldOfStudy}\n`
+          text += `${edu.university}, ${edu.graduationYear}\n\n`
+        }
+      })
+    }
+    
+    return text
   }
 
   const addExperience = () => {
@@ -54,6 +110,37 @@ export default function ResumeGeneratorPage() {
     }))
   }
 
+  const updateExperience = (index: number, field: string, value: string) => {
+    setFormData((prev) => {
+      const newExperience = [...prev.experience]
+      newExperience[index] = { ...newExperience[index], [field]: value }
+      return { ...prev, experience: newExperience }
+    })
+  }
+
+  const addEducation = () => {
+    setFormData((prev) => ({
+      ...prev,
+      education: [
+        ...prev.education,
+        {
+          degree: "",
+          fieldOfStudy: "",
+          university: "",
+          graduationYear: "",
+        },
+      ],
+    }))
+  }
+
+  const updateEducation = (index: number, field: string, value: string) => {
+    setFormData((prev) => {
+      const newEducation = [...prev.education]
+      newEducation[index] = { ...newEducation[index], [field]: value }
+      return { ...prev, education: newEducation }
+    })
+  }
+
   const addSkill = (skill: string) => {
     if (skill && !formData.skills.includes(skill)) {
       setFormData((prev) => ({
@@ -68,6 +155,32 @@ export default function ResumeGeneratorPage() {
       ...prev,
       skills: prev.skills.filter((skill) => skill !== skillToRemove),
     }))
+  }
+
+  const downloadResume = () => {
+    if (!generatedResume) return
+    
+    const text = generateResumeText(generatedResume)
+    const element = document.createElement("a")
+    const file = new Blob([text], { type: "text/plain" })
+    element.href = URL.createObjectURL(file)
+    element.download = `${generatedResume.targetRole || "Resume"}.txt`
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
+  }
+
+  const downloadPDF = () => {
+    if (!generatedResume) return
+    
+    const text = generateResumeText(generatedResume)
+    const element = document.createElement("a")
+    const file = new Blob([text], { type: "text/plain" })
+    element.href = URL.createObjectURL(file)
+    element.download = `${generatedResume.targetRole || "Resume"}.pdf`
+    document.body.appendChild(element)
+    element.click()
+    document.body.removeChild(element)
   }
 
   const steps = [
@@ -226,22 +339,36 @@ export default function ResumeGeneratorPage() {
                 <div className="grid md:grid-cols-2 gap-4">
                   <div className="space-y-2">
                     <Label>Job Title</Label>
-                    <Input placeholder="Senior Software Engineer" />
+                    <Input 
+                      placeholder="Senior Software Engineer"
+                      value={exp.title}
+                      onChange={(e) => updateExperience(index, "title", e.target.value)}
+                    />
                   </div>
                   <div className="space-y-2">
                     <Label>Company</Label>
-                    <Input placeholder="Tech Corp" />
+                    <Input 
+                      placeholder="Tech Corp"
+                      value={exp.company}
+                      onChange={(e) => updateExperience(index, "company", e.target.value)}
+                    />
                   </div>
                 </div>
                 <div className="space-y-2">
                   <Label>Duration</Label>
-                  <Input placeholder="Jan 2020 - Present" />
+                  <Input 
+                    placeholder="Jan 2020 - Present"
+                    value={exp.duration}
+                    onChange={(e) => updateExperience(index, "duration", e.target.value)}
+                  />
                 </div>
                 <div className="space-y-2">
                   <Label>Key Achievements</Label>
                   <Textarea
                     placeholder="• Led a team of 5 developers to deliver a critical project 2 weeks ahead of schedule&#10;• Improved system performance by 40% through code optimization&#10;• Mentored junior developers and conducted code reviews"
                     rows={4}
+                    value={exp.description}
+                    onChange={(e) => updateExperience(index, "description", e.target.value)}
                   />
                 </div>
               </div>
@@ -303,28 +430,50 @@ export default function ResumeGeneratorPage() {
 
             <div className="space-y-4">
               <Label>Education</Label>
-              <div className="p-4 border rounded-lg space-y-4">
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>Degree</Label>
-                    <Input placeholder="Bachelor of Science" />
+              {formData.education.map((edu, index) => (
+                <div key={index} className="p-4 border rounded-lg space-y-4">
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>Degree</Label>
+                      <Input 
+                        placeholder="Bachelor of Science"
+                        value={edu.degree}
+                        onChange={(e) => updateEducation(index, "degree", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Field of Study</Label>
+                      <Input 
+                        placeholder="Computer Science"
+                        value={edu.fieldOfStudy}
+                        onChange={(e) => updateEducation(index, "fieldOfStudy", e.target.value)}
+                      />
+                    </div>
                   </div>
-                  <div className="space-y-2">
-                    <Label>Field of Study</Label>
-                    <Input placeholder="Computer Science" />
+                  <div className="grid md:grid-cols-2 gap-4">
+                    <div className="space-y-2">
+                      <Label>University</Label>
+                      <Input 
+                        placeholder="University of Technology"
+                        value={edu.university}
+                        onChange={(e) => updateEducation(index, "university", e.target.value)}
+                      />
+                    </div>
+                    <div className="space-y-2">
+                      <Label>Graduation Year</Label>
+                      <Input 
+                        placeholder="2018"
+                        value={edu.graduationYear}
+                        onChange={(e) => updateEducation(index, "graduationYear", e.target.value)}
+                      />
+                    </div>
                   </div>
                 </div>
-                <div className="grid md:grid-cols-2 gap-4">
-                  <div className="space-y-2">
-                    <Label>University</Label>
-                    <Input placeholder="University of Technology" />
-                  </div>
-                  <div className="space-y-2">
-                    <Label>Graduation Year</Label>
-                    <Input placeholder="2018" />
-                  </div>
-                </div>
-              </div>
+              ))}
+              <Button variant="outline" onClick={addEducation} className="w-full">
+                <Plus className="w-4 h-4 mr-2" />
+                Add Education
+              </Button>
             </div>
 
             <div className="flex justify-between">
@@ -350,7 +499,7 @@ export default function ResumeGeneratorPage() {
       )}
 
       {/* Step 4: Generated Resume */}
-      {currentStep === 4 && (
+      {currentStep === 4 && generatedResume && (
         <div className="space-y-6">
           <Card>
             <CardHeader>
@@ -363,8 +512,8 @@ export default function ResumeGeneratorPage() {
               </CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="flex gap-4 mb-6">
-                <Button>
+              <div className="flex gap-4 mb-6 flex-wrap">
+                <Button onClick={downloadPDF}>
                   <Download className="w-4 h-4 mr-2" />
                   Download PDF
                 </Button>
@@ -372,62 +521,81 @@ export default function ResumeGeneratorPage() {
                   <Eye className="w-4 h-4 mr-2" />
                   Preview
                 </Button>
-                <Button variant="outline">
+                <Button variant="outline" onClick={() => setCurrentStep(3)}>
                   <FileText className="w-4 h-4 mr-2" />
                   Edit Resume
                 </Button>
               </div>
 
-              {/* Resume Preview */}
+              {/* Resume Preview - Show actual submitted data */}
               <div className="bg-white border rounded-lg p-8 shadow-sm">
                 <div className="text-center mb-6">
-                  <h2 className="text-2xl font-bold text-gray-900">John Doe</h2>
-                  <p className="text-gray-600">Senior Software Engineer</p>
-                  <p className="text-sm text-gray-500">john@example.com • +1 (555) 123-4567 • New York, NY</p>
+                  <h2 className="text-2xl font-bold text-gray-900">{generatedResume.personalInfo.fullName}</h2>
+                  <p className="text-gray-600">{generatedResume.targetRole}</p>
+                  <p className="text-sm text-gray-500">
+                    {generatedResume.personalInfo.email} • {generatedResume.personalInfo.phone} • {generatedResume.personalInfo.location}
+                  </p>
                 </div>
 
                 <div className="space-y-6">
                   <div>
                     <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Professional Summary</h3>
                     <p className="text-gray-700">
-                      Experienced Software Engineer with 5+ years of expertise in full-stack development, specializing
-                      in React, Node.js, and cloud technologies. Proven track record of leading cross-functional teams
-                      and delivering scalable solutions that improve system performance by up to 40%.
+                      Experienced {generatedResume.targetRole} with expertise in {generatedResume.skills.slice(0, 3).join(", ")}. Seeking to leverage my skills in the {generatedResume.industry} industry.
                     </p>
                   </div>
 
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Technical Skills</h3>
-                    <div className="flex flex-wrap gap-2">
-                      {["React", "Node.js", "Python", "AWS", "Docker", "MongoDB", "TypeScript"].map((skill) => (
-                        <Badge key={skill} variant="secondary">
-                          {skill}
-                        </Badge>
-                      ))}
-                    </div>
-                  </div>
-
-                  <div>
-                    <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Professional Experience</h3>
-                    <div className="space-y-4">
-                      <div>
-                        <div className="flex justify-between items-start mb-2">
-                          <div>
-                            <h4 className="font-semibold">Senior Software Engineer</h4>
-                            <p className="text-gray-600">Tech Corp</p>
-                          </div>
-                          <span className="text-sm text-gray-500">Jan 2020 - Present</span>
-                        </div>
-                        <ul className="list-disc list-inside text-sm text-gray-700 space-y-1">
-                          <li>Led a team of 5 developers to deliver a critical project 2 weeks ahead of schedule</li>
-                          <li>
-                            Improved system performance by 40% through code optimization and architecture redesign
-                          </li>
-                          <li>Mentored junior developers and conducted comprehensive code reviews</li>
-                        </ul>
+                  {generatedResume.skills.length > 0 && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Technical Skills</h3>
+                      <div className="flex flex-wrap gap-2">
+                        {generatedResume.skills.map((skill) => (
+                          <Badge key={skill} variant="secondary">
+                            {skill}
+                          </Badge>
+                        ))}
                       </div>
                     </div>
-                  </div>
+                  )}
+
+                  {generatedResume.experience.length > 0 && generatedResume.experience.some((e: any) => e.title || e.company) && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Professional Experience</h3>
+                      <div className="space-y-4">
+                        {generatedResume.experience.map((exp: any, index: number) => (
+                          (exp.title || exp.company) && (
+                            <div key={index}>
+                              <div className="flex justify-between items-start mb-2">
+                                <div>
+                                  <h4 className="font-semibold">{exp.title}</h4>
+                                  <p className="text-gray-600">{exp.company}</p>
+                                </div>
+                                <span className="text-sm text-gray-500">{exp.duration}</span>
+                              </div>
+                              <p className="text-sm text-gray-700 whitespace-pre-wrap">{exp.description}</p>
+                            </div>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  )}
+
+                  {generatedResume.education.length > 0 && generatedResume.education.some((e: any) => e.degree || e.university) && (
+                    <div>
+                      <h3 className="text-lg font-semibold text-gray-900 mb-2 border-b">Education</h3>
+                      <div className="space-y-4">
+                        {generatedResume.education.map((edu: any, index: number) => (
+                          (edu.degree || edu.university) && (
+                            <div key={index}>
+                              <h4 className="font-semibold">{edu.degree} in {edu.fieldOfStudy}</h4>
+                              <p className="text-gray-600">{edu.university}</p>
+                              <p className="text-sm text-gray-500">{edu.graduationYear}</p>
+                            </div>
+                          )
+                        ))}
+                      </div>
+                    </div>
+                  )}
                 </div>
               </div>
             </CardContent>
