@@ -48,7 +48,8 @@ export default function DashboardLayout({
     router.push("/")
   }
 
-  const getInitials = (name: string) => {
+  const getInitials = (name: string | undefined) => {
+    if (!name) return "U"
     return name
       .split(" ")
       .map((n) => n[0])
