@@ -13,7 +13,7 @@ import {
   DropdownMenuSeparator,
   DropdownMenuTrigger,
 } from "@/components/ui/dropdown-menu"
-import { BarChart3, Brain, FileText, Home, LogOut, MessageSquare, Settings, User, Briefcase } from 'lucide-react'
+import { BarChart3, Brain, FileText, Home, LogOut, MessageSquare, Settings, User, Briefcase, Linkedin } from 'lucide-react'
 import Link from "next/link"
 import { useRouter, usePathname } from 'next/navigation'
 
@@ -46,6 +46,10 @@ export default function DashboardLayout({
   const handleSignOut = () => {
     localStorage.removeItem("currentUser")
     router.push("/")
+  }
+
+  const handleLinkedIn = () => {
+    window.open("https://linkedin.com", "_blank")
   }
 
   const getInitials = (name: string | undefined) => {
@@ -81,7 +85,7 @@ export default function DashboardLayout({
           <div className="flex justify-between items-center h-16">
             <div className="flex items-center gap-2">
               <Brain className="w-8 h-8 text-blue-600" />
-              <span className="text-xl font-bold text-gray-900">CareerAI</span>
+              <span className="text-xl font-bold text-gray-900">ProGuide</span>
             </div>
 
             <nav className="hidden md:flex space-x-8">
@@ -129,6 +133,10 @@ export default function DashboardLayout({
                     <Settings className="mr-2 h-4 w-4" />
                     <span>Settings</span>
                   </Link>
+                </DropdownMenuItem>
+                <DropdownMenuItem onClick={handleLinkedIn}>
+                  <Linkedin className="mr-2 h-4 w-4" />
+                  <span>LinkedIn</span>
                 </DropdownMenuItem>
                 <DropdownMenuSeparator />
                 <DropdownMenuItem onClick={handleSignOut}>

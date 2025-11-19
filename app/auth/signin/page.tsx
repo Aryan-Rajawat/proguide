@@ -13,63 +13,41 @@ import { useRouter } from 'next/navigation'
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
-  const [name, setName] = useState("")
   const [password, setPassword] = useState("")
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [passwordError, setPasswordError] = useState("")
   const router = useRouter()
 
-  const validatePassword = (pwd: string): boolean => {
-    const hasUpperCase = /[A-Z]/.test(pwd)
-    const hasLowerCase = /[a-z]/.test(pwd)
-    const hasNumber = /[0-9]/.test(pwd)
-    const hasSpecialChar = /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd)
-    const isLongEnough = pwd.length >= 8
-
-    if (!isLongEnough) {
-      setPasswordError("Password must be at least 8 characters long")
-      return false
-    }
-    if (!hasUpperCase) {
-      setPasswordError("Password must contain at least one uppercase letter")
-      return false
-    }
-    if (!hasLowerCase) {
-      setPasswordError("Password must contain at least one lowercase letter")
-      return false
-    }
-    if (!hasNumber) {
-      setPasswordError("Password must contain at least one number")
-      return false
-    }
-    if (!hasSpecialChar) {
-      setPasswordError("Password must contain at least one special character (!@#$%^&*)")
-      return false
-    }
-    setPasswordError("")
-    return true
-  }
-
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
-    
-    if (!validatePassword(password)) {
-      return
-    }
-
+    setPasswordError("")
     setIsLoading(true)
 
     setTimeout(() => {
+      if (!email) {
+        setPasswordError("Please enter your email")
+        setIsLoading(false)
+        return
+      }
+
       const userData = {
         email: email,
-        name: name || email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+        name: email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
         joinDate: new Date().toISOString(),
         profileComplete: false,
         lastLogin: new Date().toISOString(),
       }
 
       localStorage.setItem("currentUser", JSON.stringify(userData))
+
+      const existingActivity = localStorage.getItem("userActivity")
+      const activityList = existingActivity ? JSON.parse(existingActivity) : []
+      activityList.push({
+        timestamp: new Date().toISOString(),
+        activity: `Logged in to ProGuide`
+      })
+      localStorage.setItem("userActivity", JSON.stringify(activityList))
 
       setIsLoading(false)
       router.push("/dashboard")
@@ -82,24 +60,13 @@ export default function SignInPage() {
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Brain className="w-8 h-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">CareerAI</span>
+            <span className="text-2xl font-bold text-gray-900">ProGuide</span>
           </div>
           <CardTitle className="text-2xl">Welcome back</CardTitle>
-          <CardDescription>Sign in to your account to continue your career journey</CardDescription>
+          <CardDescription>Sign in to your account</CardDescription>
         </CardHeader>
         <CardContent>
           <form onSubmit={handleSignIn} className="space-y-4">
-            <div className="space-y-2">
-              <Label htmlFor="name">Full Name</Label>
-              <Input
-                id="name"
-                type="text"
-                placeholder="Enter your full name"
-                value={name}
-                onChange={(e) => setName(e.target.value)}
-                required
-              />
-            </div>
             <div className="space-y-2">
               <Label htmlFor="email">Email</Label>
               <Input
@@ -147,7 +114,7 @@ export default function SignInPage() {
                 </div>
               )}
             </div>
-            <Button type="submit" className="w-full" disabled={isLoading || !!passwordError}>
+            <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
           </form>

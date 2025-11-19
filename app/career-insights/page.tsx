@@ -6,17 +6,17 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { TrendingUp, DollarSign, Target, Briefcase, Users, Calendar, ArrowUp, Star, BookOpen, Zap } from "lucide-react"
+import { TrendingUp, DollarSign, Target, Briefcase, Users, Calendar, ArrowUp, Star, BookOpen, Zap } from 'lucide-react'
 
 export default function CareerInsightsPage() {
-  const [selectedLocation, setSelectedLocation] = useState("San Francisco, CA")
+  const [selectedLocation, setSelectedLocation] = useState("Bangalore, India")
 
   const marketTrends = [
     {
       role: "Software Engineer",
-      growth: 15.5,
+      growth: 18.5,
       demand: "High",
-      avgSalary: 120000,
+      avgSalary: 1500000, // ₹15 lakhs in rupees
       openings: 2500,
       skills: ["React", "Node.js", "Python", "AWS", "Docker"],
     },
@@ -24,7 +24,7 @@ export default function CareerInsightsPage() {
       role: "Data Scientist",
       growth: 22.3,
       demand: "High",
-      avgSalary: 110000,
+      avgSalary: 1800000, // ₹18 lakhs in rupees
       openings: 1200,
       skills: ["Python", "R", "SQL", "Machine Learning", "Statistics"],
     },
@@ -32,7 +32,7 @@ export default function CareerInsightsPage() {
       role: "DevOps Engineer",
       growth: 25.8,
       demand: "High",
-      avgSalary: 115000,
+      avgSalary: 1600000, // ₹16 lakhs in rupees
       openings: 800,
       skills: ["Docker", "Kubernetes", "AWS", "CI/CD", "Linux"],
     },
@@ -40,7 +40,7 @@ export default function CareerInsightsPage() {
       role: "Product Manager",
       growth: 18.7,
       demand: "High",
-      avgSalary: 130000,
+      avgSalary: 1700000, // ₹17 lakhs in rupees
       openings: 600,
       skills: ["Product Strategy", "Analytics", "Agile", "Leadership"],
     },
@@ -67,7 +67,7 @@ export default function CareerInsightsPage() {
       type: "Salary",
       title: "Salary Benchmark",
       description: "You're earning 15% above market average",
-      items: ["Market avg: $95k", "Your range: $110k", "Top 25%: $125k"],
+      items: ["Market avg: ₹13L", "Your range: ₹15L", "Top 25%: ₹18L"],
       priority: "Medium",
     },
     {
@@ -83,27 +83,35 @@ export default function CareerInsightsPage() {
     {
       date: "This Week",
       insights: [
-        "React job postings increased by 12% in your area",
-        "3 new companies are hiring for your skill set",
-        "Average salary for your role increased by $2k",
+        "React job postings increased by 12% in Bangalore",
+        "3 new companies like Razorpay are hiring for your skill set",
+        "Average salary for your role increased by ₹50,000",
       ],
     },
     {
       date: "Last Week",
       insights: [
-        "TypeScript demand grew 8% across tech companies",
+        "TypeScript demand grew 8% across tech companies in India",
         "Remote work opportunities increased by 15%",
         "5 new startups posted senior developer roles",
       ],
     },
   ]
 
+  const formatSalary = (amount: number) => {
+    return new Intl.NumberFormat("en-IN", {
+      style: "currency",
+      currency: "INR",
+      minimumFractionDigits: 0,
+    }).format(amount)
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Career Insights</h1>
-        <p className="text-gray-600">Real-time market analysis and personalized career recommendations</p>
+        <p className="text-gray-600">Real-time market analysis and personalized career recommendations for India</p>
       </div>
 
       {/* Key Metrics */}
@@ -129,13 +137,13 @@ export default function CareerInsightsPage() {
             <div className="flex items-center justify-between">
               <div>
                 <p className="text-sm font-medium text-gray-600">Avg Salary</p>
-                <p className="text-2xl font-bold text-blue-600">$118K</p>
+                <p className="text-2xl font-bold text-blue-600">₹15L</p>
               </div>
               <DollarSign className="w-8 h-8 text-blue-600" />
             </div>
             <div className="flex items-center mt-2 text-sm text-blue-600">
               <ArrowUp className="w-4 h-4 mr-1" />
-              <span>+8% YoY</span>
+              <span>+12% YoY</span>
             </div>
           </CardContent>
         </Card>
@@ -222,7 +230,7 @@ export default function CareerInsightsPage() {
                     <div className="grid md:grid-cols-2 gap-4">
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Average Salary</p>
-                        <p className="text-xl font-bold text-blue-600">${trend.avgSalary.toLocaleString()}</p>
+                        <p className="text-xl font-bold text-blue-600">{formatSalary(trend.avgSalary)}</p>
                       </div>
                       <div>
                         <p className="text-sm font-medium text-gray-600 mb-2">Top Skills Required</p>
@@ -282,7 +290,13 @@ export default function CareerInsightsPage() {
                   <div className="flex items-start justify-between">
                     <div>
                       <CardTitle className="flex items-center gap-2">
-                        <Target className="w-5 h-5 text-blue-600" />
+                        {insight.type === "Skill Gap" ? (
+                          <Target className="w-5 h-5 text-blue-600" />
+                        ) : insight.type === "Salary" ? (
+                          <DollarSign className="w-5 h-5 text-green-600" />
+                        ) : (
+                          <TrendingUp className="w-5 h-5 text-purple-600" />
+                        )}
                         {insight.title}
                       </CardTitle>
                       <CardDescription>{insight.description}</CardDescription>

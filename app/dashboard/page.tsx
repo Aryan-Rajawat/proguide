@@ -17,6 +17,11 @@ interface UserData {
   lastLogin: string
 }
 
+interface ActivityData {
+  timestamp: string
+  activity: string
+}
+
 const convertToRupees = (dollars: number): string => {
   const rupees = dollars * 83 // Approximate conversion rate
   return new Intl.NumberFormat("en-IN", {
@@ -28,12 +33,19 @@ const convertToRupees = (dollars: number): string => {
 
 export default function DashboardPage() {
   const [userData, setUserData] = useState<UserData | null>(null)
+  const [activityData, setActivityData] = useState<ActivityData[] | null>(null)
 
   useEffect(() => {
     // Get user data from localStorage
     const storedUser = localStorage.getItem("currentUser")
     if (storedUser) {
       setUserData(JSON.parse(storedUser))
+    }
+
+    // Get activity data from localStorage
+    const storedActivity = localStorage.getItem("userActivity")
+    if (storedActivity) {
+      setActivityData(JSON.parse(storedActivity))
     }
   }, [])
 
@@ -106,7 +118,7 @@ export default function DashboardPage() {
       )}
 
       {/* Quick Stats */}
-      <div className="grid grid-cols-1 md:grid-cols-4 gap-6">
+      <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
         <Card>
           <CardContent className="p-6">
             <div className="flex items-center gap-4">
@@ -114,8 +126,8 @@ export default function DashboardPage() {
                 <FileText className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{convertToRupees(3)}</p>
-                <p className="text-sm text-gray-600">Earning Potential</p>
+                <p className="text-2xl font-bold">3</p>
+                <p className="text-sm text-gray-600">Resumes Created</p>
               </div>
             </div>
           </CardContent>
@@ -128,36 +140,8 @@ export default function DashboardPage() {
                 <MessageSquare className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">{convertToRupees(12)}</p>
-                <p className="text-sm text-gray-600">Monthly Target</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-purple-100 rounded-lg">
-                <TrendingUp className="w-6 h-6 text-purple-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">85%</p>
-                <p className="text-sm text-gray-600">Skill Match</p>
-              </div>
-            </div>
-          </CardContent>
-        </Card>
-
-        <Card>
-          <CardContent className="p-6">
-            <div className="flex items-center gap-4">
-              <div className="p-2 bg-orange-100 rounded-lg">
-                <Award className="w-6 h-6 text-orange-600" />
-              </div>
-              <div>
-                <p className="text-2xl font-bold">{convertToRupees(7)}</p>
-                <p className="text-sm text-gray-600">Bonus Earned</p>
+                <p className="text-2xl font-bold">5</p>
+                <p className="text-sm text-gray-600">Mock Interviews Completed</p>
               </div>
             </div>
           </CardContent>
@@ -177,28 +161,20 @@ export default function DashboardPage() {
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                  <FileText className="w-5 h-5 text-blue-600" />
-                  <div className="flex-1">
-                    <p className="font-medium">Resume updated</p>
-                    <p className="text-sm text-gray-600">Software Engineer resume - 2 hours ago</p>
+              <div className="space-y-4" id="activity-list">
+                {activityData && activityData.map((activity, index) => (
+                  <div key={index} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                    <FileText className="w-5 h-5 text-blue-600" />
+                    <div className="flex-1">
+                      <p className="font-medium">{activity.activity}</p>
+                      <p className="text-sm text-gray-600">{new Date(activity.timestamp).toLocaleDateString("en-US", {
+                        year: "numeric",
+                        month: "long",
+                        day: "numeric",
+                      })}</p>
+                    </div>
                   </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <MessageSquare className="w-5 h-5 text-green-600" />
-                  <div className="flex-1">
-                    <p className="font-medium">Mock interview completed</p>
-                    <p className="text-sm text-gray-600">Technical interview practice - Yesterday</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-purple-50 rounded-lg">
-                  <BarChart3 className="w-5 h-5 text-purple-600" />
-                  <div className="flex-1">
-                    <p className="font-medium">Career insights generated</p>
-                    <p className="text-sm text-gray-600">Weekly report available - 3 days ago</p>
-                  </div>
-                </div>
+                ))}
               </div>
             </CardContent>
           </Card>

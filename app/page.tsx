@@ -12,7 +12,7 @@ export default function LandingPage() {
         <div className="container mx-auto px-4 py-4 flex items-center justify-between">
           <div className="flex items-center gap-2">
             <Brain className="w-8 h-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">CareerAI</span>
+            <span className="text-2xl font-bold text-gray-900">ProGuide</span>
           </div>
           <div className="flex items-center gap-4">
             <Link href="/auth/signin">
@@ -193,9 +193,9 @@ export default function LandingPage() {
           <div className="flex items-center justify-between">
             <div className="flex items-center gap-2">
               <Brain className="w-6 h-6" />
-              <span className="text-xl font-bold">CareerAI</span>
+              <span className="text-xl font-bold">ProGuide</span>
             </div>
-            <p className="text-gray-400">© 2024 CareerAI. All rights reserved.</p>
+            <p className="text-gray-400">© 2024 ProGuide. All rights reserved.</p>
           </div>
         </div>
       </footer>

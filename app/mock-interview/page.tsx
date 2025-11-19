@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { MessageSquare, Play, Pause, RotateCcw, CheckCircle, Clock, Target, TrendingUp, Lightbulb } from "lucide-react"
+import { MessageSquare, Play, Pause, RotateCcw, CheckCircle, Clock, Target, TrendingUp, Lightbulb } from 'lucide-react'
 
 export default function MockInterviewPage() {
   const [interviewType, setInterviewType] = useState("")
@@ -66,21 +66,43 @@ export default function MockInterviewPage() {
     return interviewQuestions[interviewType as keyof typeof interviewQuestions] || []
   }
 
-  const mockResults = {
-    overallScore: 85,
-    strengths: ["Clear and concise communication", "Strong technical knowledge", "Good problem-solving approach"],
-    improvements: [
-      "Provide more specific examples",
-      "Structure answers using STAR method",
-      "Show more enthusiasm for the role",
-    ],
-    questionScores: [
-      { question: "Technical concepts", score: 90 },
-      { question: "Problem solving", score: 85 },
-      { question: "Communication", score: 80 },
-      { question: "Cultural fit", score: 85 },
-    ],
+  const generateMockResults = () => {
+    // Calculate answer quality based on word count and structure
+    const answerQuality = answers.reduce((sum, answer) => {
+      const wordCount = answer.trim().split(/\s+/).length
+      // Higher scores for longer, more detailed answers
+      const qualityScore = Math.min(wordCount / 30, 1)
+      return sum + qualityScore
+    }, 0) / (answers.length || 1)
+
+    // Base score calculation with reduced randomness for consistency
+    const baseScore = 65 + (answerQuality * 30)
+    const finalScore = Math.min(Math.max(Math.round(baseScore), 60), 100)
+
+    return {
+      overallScore: finalScore,
+      strengths: [
+        "Clear and concise communication",
+        "Strong problem-solving approach",
+        "Good technical understanding",
+        "Relevant examples provided"
+      ].slice(0, 3),
+      improvements: [
+        "Provide more specific examples",
+        "Structure answers using STAR method",
+        "Show more enthusiasm for the role",
+        "Include quantifiable results"
+      ].slice(0, 3),
+      questionScores: [
+        { question: "Technical concepts", score: Math.min(finalScore + 5, 100) },
+        { question: "Problem solving", score: finalScore },
+        { question: "Communication", score: Math.min(finalScore + 3, 100) },
+        { question: "Cultural fit", score: Math.min(finalScore - 3, 100) },
+      ].map(item => ({ ...item, score: Math.round(item.score) }))
+    }
   }
+
+  const mockResults = generateMockResults()
 
   return (
     <div className="max-w-4xl mx-auto space-y-8">

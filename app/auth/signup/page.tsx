@@ -82,7 +82,6 @@ export default function SignUpPage() {
 
     setIsLoading(true)
 
-    // Simulate registration
     setTimeout(() => {
       const userData = {
         firstName: formData.firstName,
@@ -109,7 +108,7 @@ export default function SignUpPage() {
         <CardHeader className="text-center">
           <div className="flex items-center justify-center gap-2 mb-4">
             <Brain className="w-8 h-8 text-blue-600" />
-            <span className="text-2xl font-bold text-gray-900">CareerAI</span>
+            <span className="text-2xl font-bold text-gray-900">ProGuide</span>
           </div>
           <CardTitle className="text-2xl">Create your account</CardTitle>
           <CardDescription>Start your AI-powered career journey today</CardDescription>
