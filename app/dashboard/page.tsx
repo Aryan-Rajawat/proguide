@@ -6,8 +6,21 @@ import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/com
 import { Progress } from "@/components/ui/progress"
 import { Badge } from "@/components/ui/badge"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
-import { BarChart3, BrainCircuit, Calendar, FileText, MessageSquare, Target, TrendingUp, User, Briefcase, Clock, Award } from 'lucide-react'
+import { Input } from "@/components/ui/input"
+import {
+  BarChart3,
+  BrainCircuit,
+  Calendar,
+  FileText,
+  MessageSquare,
+  Target,
+  Briefcase,
+  Clock,
+  X,
+  Plus,
+} from "lucide-react"
 import Link from "next/link"
+import { createBrowserClient } from "@supabase/ssr"
 
 interface UserData {
   email: string
@@ -15,6 +28,9 @@ interface UserData {
   joinDate: string
   profileComplete: boolean
   lastLogin: string
+  id: string
+  careerGoals?: string
+  skills?: string[]
 }
 
 interface ActivityData {
@@ -22,8 +38,16 @@ interface ActivityData {
   activity: string
 }
 
+interface Task {
+  id: string
+  title: string
+  dueDate: string
+  priority: "high" | "medium" | "low"
+  completed: boolean
+}
+
 const convertToRupees = (dollars: number): string => {
-  const rupees = dollars * 83 // Approximate conversion rate
+  const rupees = dollars * 83
   return new Intl.NumberFormat("en-IN", {
     style: "currency",
     currency: "INR",
@@ -34,20 +58,85 @@ const convertToRupees = (dollars: number): string => {
 export default function DashboardPage() {
   const [userData, setUserData] = useState<UserData | null>(null)
   const [activityData, setActivityData] = useState<ActivityData[] | null>(null)
+  const [resumeCount, setResumeCount] = useState(0)
+  const [interviewCount, setInterviewCount] = useState(0)
+  const [loading, setLoading] = useState(true)
+  const [tasks, setTasks] = useState<Task[]>([])
+  const [newTask, setNewTask] = useState("")
+  const [newTaskDueDate, setNewTaskDueDate] = useState("")
+
+  const supabase = createBrowserClient(
+    process.env.NEXT_PUBLIC_SUPABASE_URL || "",
+    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
+  )
 
   useEffect(() => {
-    // Get user data from localStorage
-    const storedUser = localStorage.getItem("currentUser")
-    if (storedUser) {
-      setUserData(JSON.parse(storedUser))
+    const initializeDashboard = async () => {
+      try {
+        const storedUser = localStorage.getItem("currentUser")
+        if (storedUser) {
+          const user = JSON.parse(storedUser)
+          setUserData(user)
+
+          const { data: allResumes } = await supabase.from("resumes").select("id").eq("user_id", user.id)
+          setResumeCount(allResumes?.length || 0)
+
+          try {
+            const { data: interviews } = await supabase.from("mock_interviews").select("id").eq("user_id", user.id)
+            setInterviewCount(interviews?.length || 0)
+          } catch {
+            const localInterviews = JSON.parse(localStorage.getItem("interviewSessions") || "[]")
+            setInterviewCount(localInterviews.length)
+          }
+        }
+
+        const storedActivity = localStorage.getItem("userActivity")
+        if (storedActivity) {
+          setActivityData(JSON.parse(storedActivity))
+        }
+
+        const storedTasks = localStorage.getItem("userTasks")
+        if (storedTasks) {
+          setTasks(JSON.parse(storedTasks))
+        }
+      } catch (error) {
+        console.log("[v0] Error initializing dashboard:", error)
+      } finally {
+        setLoading(false)
+      }
     }
 
-    // Get activity data from localStorage
-    const storedActivity = localStorage.getItem("userActivity")
-    if (storedActivity) {
-      setActivityData(JSON.parse(storedActivity))
-    }
+    initializeDashboard()
   }, [])
+
+  const handleAddTask = () => {
+    if (newTask.trim()) {
+      const task: Task = {
+        id: Date.now().toString(),
+        title: newTask,
+        dueDate: newTaskDueDate || new Date(Date.now() + 24 * 60 * 60 * 1000).toISOString().split("T")[0],
+        priority: "medium",
+        completed: false,
+      }
+      const updatedTasks = [...tasks, task]
+      setTasks(updatedTasks)
+      localStorage.setItem("userTasks", JSON.stringify(updatedTasks))
+      setNewTask("")
+      setNewTaskDueDate("")
+    }
+  }
+
+  const handleDeleteTask = (taskId: string) => {
+    const updatedTasks = tasks.filter((t) => t.id !== taskId)
+    setTasks(updatedTasks)
+    localStorage.setItem("userTasks", JSON.stringify(updatedTasks))
+  }
+
+  const handleToggleTask = (taskId: string) => {
+    const updatedTasks = tasks.map((t) => (t.id === taskId ? { ...t, completed: !t.completed } : t))
+    setTasks(updatedTasks)
+    localStorage.setItem("userTasks", JSON.stringify(updatedTasks))
+  }
 
   const getInitials = (name: string | undefined) => {
     if (!name) return "U"
@@ -66,7 +155,7 @@ export default function DashboardPage() {
     })
   }
 
-  if (!userData) {
+  if (loading || !userData) {
     return (
       <div className="flex items-center justify-center min-h-screen">
         <div className="animate-spin rounded-full h-32 w-32 border-b-2 border-blue-600"></div>
@@ -85,37 +174,10 @@ export default function DashboardPage() {
           <div>
             <h1 className="text-3xl font-bold">Welcome back, {userData.name}!</h1>
             <p className="text-blue-100 mt-1">Member since {formatDate(userData.joinDate)}</p>
-            <p className="text-blue-100 text-sm">Last login: {formatDate(userData.lastLogin)}</p>
+            {userData.careerGoals && <p className="text-blue-100 text-sm">Goal: {userData.careerGoals}</p>}
           </div>
         </div>
       </div>
-
-      {/* Profile Completion */}
-      {!userData.profileComplete && (
-        <Card className="border-orange-200 bg-orange-50">
-          <CardHeader>
-            <CardTitle className="flex items-center gap-2 text-orange-800">
-              <User className="w-5 h-5" />
-              Complete Your Profile
-            </CardTitle>
-            <CardDescription className="text-orange-600">
-              Complete your profile to get personalized career recommendations
-            </CardDescription>
-          </CardHeader>
-          <CardContent>
-            <div className="space-y-3">
-              <div className="flex justify-between text-sm">
-                <span>Profile completion</span>
-                <span>60%</span>
-              </div>
-              <Progress value={60} className="h-2" />
-              <Link href="/profile">
-                <Button className="w-full bg-orange-600 hover:bg-orange-700">Complete Profile</Button>
-              </Link>
-            </div>
-          </CardContent>
-        </Card>
-      )}
 
       {/* Quick Stats */}
       <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
@@ -126,7 +188,7 @@ export default function DashboardPage() {
                 <FileText className="w-6 h-6 text-blue-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">3</p>
+                <p className="text-2xl font-bold">{resumeCount}</p>
                 <p className="text-sm text-gray-600">Resumes Created</p>
               </div>
             </div>
@@ -140,7 +202,7 @@ export default function DashboardPage() {
                 <MessageSquare className="w-6 h-6 text-green-600" />
               </div>
               <div>
-                <p className="text-2xl font-bold">5</p>
+                <p className="text-2xl font-bold">{interviewCount}</p>
                 <p className="text-sm text-gray-600">Mock Interviews Completed</p>
               </div>
             </div>
@@ -162,19 +224,25 @@ export default function DashboardPage() {
             </CardHeader>
             <CardContent>
               <div className="space-y-4" id="activity-list">
-                {activityData && activityData.map((activity, index) => (
-                  <div key={index} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                    <FileText className="w-5 h-5 text-blue-600" />
-                    <div className="flex-1">
-                      <p className="font-medium">{activity.activity}</p>
-                      <p className="text-sm text-gray-600">{new Date(activity.timestamp).toLocaleDateString("en-US", {
-                        year: "numeric",
-                        month: "long",
-                        day: "numeric",
-                      })}</p>
+                {activityData && activityData.length > 0 ? (
+                  activityData.map((activity, index) => (
+                    <div key={index} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
+                      <FileText className="w-5 h-5 text-blue-600" />
+                      <div className="flex-1">
+                        <p className="font-medium">{activity.activity}</p>
+                        <p className="text-sm text-gray-600">
+                          {new Date(activity.timestamp).toLocaleDateString("en-US", {
+                            year: "numeric",
+                            month: "long",
+                            day: "numeric",
+                          })}
+                        </p>
+                      </div>
                     </div>
-                  </div>
-                ))}
+                  ))
+                ) : (
+                  <p className="text-gray-600 text-sm">No recent activity</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -223,32 +291,17 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <Target className="w-5 h-5" />
-                Career Goals
+                Career Goal
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">Land a Senior Role</span>
-                    <span className="text-sm text-gray-600">75%</span>
-                  </div>
-                  <Progress value={75} className="h-2" />
+              <p className="text-sm text-gray-700">{userData.careerGoals || "No career goal set"}</p>
+              <div className="mt-4 space-y-2">
+                <div className="flex justify-between text-sm">
+                  <span>Progress</span>
+                  <span>40%</span>
                 </div>
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">Improve Technical Skills</span>
-                    <span className="text-sm text-gray-600">60%</span>
-                  </div>
-                  <Progress value={60} className="h-2" />
-                </div>
-                <div>
-                  <div className="flex justify-between items-center mb-2">
-                    <span className="text-sm font-medium">Build Network</span>
-                    <span className="text-sm text-gray-600">40%</span>
-                  </div>
-                  <Progress value={40} className="h-2" />
-                </div>
+                <Progress value={40} className="h-2" />
               </div>
             </CardContent>
           </Card>
@@ -261,29 +314,49 @@ export default function DashboardPage() {
                 Upcoming Tasks
               </CardTitle>
             </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-red-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Update LinkedIn profile</p>
-                    <p className="text-xs text-gray-600">Due today</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-yellow-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Practice system design</p>
-                    <p className="text-xs text-gray-600">Due tomorrow</p>
-                  </div>
-                </div>
-                <div className="flex items-center gap-3">
-                  <div className="w-2 h-2 bg-green-500 rounded-full"></div>
-                  <div className="flex-1">
-                    <p className="text-sm font-medium">Apply to 5 jobs</p>
-                    <p className="text-xs text-gray-600">Due this week</p>
-                  </div>
-                </div>
+            <CardContent className="space-y-4">
+              <div className="flex gap-2">
+                <Input
+                  placeholder="Add a new task"
+                  value={newTask}
+                  onChange={(e) => setNewTask(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && handleAddTask()}
+                  className="text-sm"
+                />
+                <Button size="sm" onClick={handleAddTask} className="px-3">
+                  <Plus className="w-4 h-4" />
+                </Button>
+              </div>
+
+              <div className="space-y-2">
+                {tasks.length > 0 ? (
+                  tasks.map((task) => (
+                    <div key={task.id} className="flex items-start gap-3 p-2 bg-gray-50 rounded-lg hover:bg-gray-100">
+                      <input
+                        type="checkbox"
+                        checked={task.completed}
+                        onChange={() => handleToggleTask(task.id)}
+                        className="mt-1"
+                      />
+                      <div className="flex-1 min-w-0">
+                        <p className={`text-sm font-medium ${task.completed ? "line-through text-gray-400" : ""}`}>
+                          {task.title}
+                        </p>
+                        <p className="text-xs text-gray-600">{formatDate(task.dueDate)}</p>
+                      </div>
+                      <Button
+                        size="sm"
+                        variant="ghost"
+                        onClick={() => handleDeleteTask(task.id)}
+                        className="h-6 w-6 p-0"
+                      >
+                        <X className="w-4 h-4" />
+                      </Button>
+                    </div>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600">No tasks yet. Add one to get started!</p>
+                )}
               </div>
             </CardContent>
           </Card>
@@ -293,27 +366,20 @@ export default function DashboardPage() {
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
                 <BrainCircuit className="w-5 h-5" />
-                Skills Progress
+                Your Skills
               </CardTitle>
             </CardHeader>
             <CardContent>
-              <div className="space-y-4">
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">JavaScript</span>
-                  <Badge variant="secondary">Advanced</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">React</span>
-                  <Badge variant="secondary">Advanced</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">Node.js</span>
-                  <Badge variant="outline">Intermediate</Badge>
-                </div>
-                <div className="flex items-center justify-between">
-                  <span className="text-sm">System Design</span>
-                  <Badge variant="outline">Learning</Badge>
-                </div>
+              <div className="space-y-2 flex flex-wrap gap-2">
+                {userData.skills && userData.skills.length > 0 ? (
+                  userData.skills.map((skill) => (
+                    <Badge key={skill} variant="secondary">
+                      {skill}
+                    </Badge>
+                  ))
+                ) : (
+                  <p className="text-sm text-gray-600">No skills added yet</p>
+                )}
               </div>
             </CardContent>
           </Card>

@@ -1,5 +1,7 @@
 "use client"
 
+import type React from "react"
+
 import { useState } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
@@ -8,18 +10,16 @@ import { Label } from "@/components/ui/label"
 import { Textarea } from "@/components/ui/textarea"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Badge } from "@/components/ui/badge"
-import { Progress } from "@/components/ui/progress"
-import { FileText, Download, Eye, Sparkles, Plus, X, Upload, Trash2 } from 'lucide-react'
-import Image from 'next/image'
+import { Download, Plus, X, Upload, Trash2 } from "lucide-react"
 
-type ResumeTemplate = 'modern' | 'classic' | 'creative' | 'minimal'
-type ResumeFormat = 'pdf' | 'txt' | 'docx'
+type ResumeTemplate = "modern" | "classic" | "creative" | "minimal"
+type ResumeFormat = "pdf" | "txt" | "docx"
 
 export default function ResumeGeneratorPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isGenerating, setIsGenerating] = useState(false)
-  const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate>('modern')
-  const [selectedFormat, setSelectedFormat] = useState<ResumeFormat>('pdf')
+  const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate>("modern")
+  const [selectedFormat, setSelectedFormat] = useState<ResumeFormat>("pdf")
   const [photoPreview, setPhotoPreview] = useState<string>("")
   const [customSections, setCustomSections] = useState<Array<{ name: string; content: string }>>([])
   const [newSectionName, setNewSectionName] = useState("")
@@ -146,6 +146,7 @@ export default function ResumeGeneratorPage() {
       setIsGenerating(false)
       setCurrentStep(5)
 
+      // Save to localStorage
       const resumes = JSON.parse(localStorage.getItem("resumes") || "[]")
       const newResume = {
         id: Date.now().toString(),
@@ -158,6 +159,15 @@ export default function ResumeGeneratorPage() {
       }
       resumes.push(newResume)
       localStorage.setItem("resumes", JSON.stringify(resumes))
+
+      const userActivity = JSON.parse(localStorage.getItem("userActivity") || "[]")
+      userActivity.push({
+        timestamp: new Date().toISOString(),
+        activity: `Created resume: ${newResume.title}`,
+        type: "resume_created",
+        resumeId: newResume.id,
+      })
+      localStorage.setItem("userActivity", JSON.stringify(userActivity))
     }, 2000)
   }
 
@@ -239,10 +249,10 @@ export default function ResumeGeneratorPage() {
   ]
 
   const templates = [
-    { id: 'modern', name: 'Modern', desc: 'Clean and contemporary' },
-    { id: 'classic', name: 'Classic', desc: 'Professional and timeless' },
-    { id: 'creative', name: 'Creative', desc: 'Bold and eye-catching' },
-    { id: 'minimal', name: 'Minimal', desc: 'Simple and elegant' },
+    { id: "modern", name: "Modern", desc: "Clean and contemporary" },
+    { id: "classic", name: "Classic", desc: "Professional and timeless" },
+    { id: "creative", name: "Creative", desc: "Bold and eye-catching" },
+    { id: "minimal", name: "Minimal", desc: "Simple and elegant" },
   ]
 
   return (
@@ -289,13 +299,7 @@ export default function ResumeGeneratorPage() {
                 <Button variant="outline" type="button" asChild>
                   <span>Upload Photo</span>
                 </Button>
-                <input
-                  id="photo-upload"
-                  type="file"
-                  accept="image/*"
-                  onChange={handlePhotoUpload}
-                  className="hidden"
-                />
+                <input id="photo-upload" type="file" accept="image/*" onChange={handlePhotoUpload} className="hidden" />
               </Label>
             </div>
 
@@ -421,39 +425,62 @@ export default function ResumeGeneratorPage() {
             {formData.experience.map((exp, index) => (
               <div key={index} className="p-4 border rounded-lg space-y-4">
                 <div className="grid md:grid-cols-2 gap-4">
-                  <Input placeholder="Job Title" value={exp.title} onChange={(e) => {
-                    const newExp = [...formData.experience]
-                    newExp[index].title = e.target.value
-                    setFormData((prev) => ({ ...prev, experience: newExp }))
-                  }} />
-                  <Input placeholder="Company" value={exp.company} onChange={(e) => {
-                    const newExp = [...formData.experience]
-                    newExp[index].company = e.target.value
-                    setFormData((prev) => ({ ...prev, experience: newExp }))
-                  }} />
+                  <Input
+                    placeholder="Job Title"
+                    value={exp.title}
+                    onChange={(e) => {
+                      const newExp = [...formData.experience]
+                      newExp[index].title = e.target.value
+                      setFormData((prev) => ({ ...prev, experience: newExp }))
+                    }}
+                  />
+                  <Input
+                    placeholder="Company"
+                    value={exp.company}
+                    onChange={(e) => {
+                      const newExp = [...formData.experience]
+                      newExp[index].company = e.target.value
+                      setFormData((prev) => ({ ...prev, experience: newExp }))
+                    }}
+                  />
                 </div>
-                <Input placeholder="Duration (e.g., Jan 2020 - Present)" value={exp.duration} onChange={(e) => {
-                  const newExp = [...formData.experience]
-                  newExp[index].duration = e.target.value
-                  setFormData((prev) => ({ ...prev, experience: newExp }))
-                }} />
-                <Textarea placeholder="Key achievements..." rows={3} value={exp.description} onChange={(e) => {
-                  const newExp = [...formData.experience]
-                  newExp[index].description = e.target.value
-                  setFormData((prev) => ({ ...prev, experience: newExp }))
-                }} />
+                <Input
+                  placeholder="Duration (e.g., Jan 2020 - Present)"
+                  value={exp.duration}
+                  onChange={(e) => {
+                    const newExp = [...formData.experience]
+                    newExp[index].duration = e.target.value
+                    setFormData((prev) => ({ ...prev, experience: newExp }))
+                  }}
+                />
+                <Textarea
+                  placeholder="Key achievements..."
+                  rows={3}
+                  value={exp.description}
+                  onChange={(e) => {
+                    const newExp = [...formData.experience]
+                    newExp[index].description = e.target.value
+                    setFormData((prev) => ({ ...prev, experience: newExp }))
+                  }}
+                />
               </div>
             ))}
-            <Button variant="outline" onClick={() => {
-              setFormData((prev) => ({
-                ...prev,
-                experience: [...prev.experience, { title: "", company: "", duration: "", description: "" }],
-              }))
-            }} className="w-full">
+            <Button
+              variant="outline"
+              onClick={() => {
+                setFormData((prev) => ({
+                  ...prev,
+                  experience: [...prev.experience, { title: "", company: "", duration: "", description: "" }],
+                }))
+              }}
+              className="w-full"
+            >
               <Plus className="w-4 h-4 mr-2" /> Add Experience
             </Button>
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setCurrentStep(1)}>Previous</Button>
+              <Button variant="outline" onClick={() => setCurrentStep(1)}>
+                Previous
+              </Button>
               <Button onClick={() => setCurrentStep(3)}>Next Step</Button>
             </div>
           </CardContent>
@@ -489,28 +516,34 @@ export default function ResumeGeneratorPage() {
                 {formData.skills.map((skill) => (
                   <Badge key={skill} variant="secondary" className="flex items-center gap-1">
                     {skill}
-                    <X className="w-3 h-3 cursor-pointer" onClick={() => {
-                      setFormData((prev) => ({
-                        ...prev,
-                        skills: prev.skills.filter((s) => s !== skill),
-                      }))
-                    }} />
+                    <X
+                      className="w-3 h-3 cursor-pointer"
+                      onClick={() => {
+                        setFormData((prev) => ({
+                          ...prev,
+                          skills: prev.skills.filter((s) => s !== skill),
+                        }))
+                      }}
+                    />
                   </Badge>
                 ))}
               </div>
               <div className="flex gap-2">
-                <Input placeholder="Add a skill" onKeyPress={(e) => {
-                  if (e.key === "Enter") {
-                    const skill = (e.target as HTMLInputElement).value
-                    if (skill && !formData.skills.includes(skill)) {
-                      setFormData((prev) => ({
-                        ...prev,
-                        skills: [...prev.skills, skill],
-                      }))
+                <Input
+                  placeholder="Add a skill"
+                  onKeyPress={(e) => {
+                    if (e.key === "Enter") {
+                      const skill = (e.target as HTMLInputElement).value
+                      if (skill && !formData.skills.includes(skill)) {
+                        setFormData((prev) => ({
+                          ...prev,
+                          skills: [...prev.skills, skill],
+                        }))
+                      }
+                      ;(e.target as HTMLInputElement).value = ""
                     }
-                    ;(e.target as HTMLInputElement).value = ""
-                  }
-                }} />
+                  }}
+                />
               </div>
             </div>
 
@@ -519,43 +552,68 @@ export default function ResumeGeneratorPage() {
               {formData.education.map((edu, index) => (
                 <div key={index} className="p-4 border rounded-lg space-y-4">
                   <div className="grid md:grid-cols-2 gap-4">
-                    <Input placeholder="Degree" value={edu.degree} onChange={(e) => {
-                      const newEdu = [...formData.education]
-                      newEdu[index].degree = e.target.value
-                      setFormData((prev) => ({ ...prev, education: newEdu }))
-                    }} />
-                    <Input placeholder="Field of Study" value={edu.fieldOfStudy} onChange={(e) => {
-                      const newEdu = [...formData.education]
-                      newEdu[index].fieldOfStudy = e.target.value
-                      setFormData((prev) => ({ ...prev, education: newEdu }))
-                    }} />
+                    <Input
+                      placeholder="Degree"
+                      value={edu.degree}
+                      onChange={(e) => {
+                        const newEdu = [...formData.education]
+                        newEdu[index].degree = e.target.value
+                        setFormData((prev) => ({ ...prev, education: newEdu }))
+                      }}
+                    />
+                    <Input
+                      placeholder="Field of Study"
+                      value={edu.fieldOfStudy}
+                      onChange={(e) => {
+                        const newEdu = [...formData.education]
+                        newEdu[index].fieldOfStudy = e.target.value
+                        setFormData((prev) => ({ ...prev, education: newEdu }))
+                      }}
+                    />
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <Input placeholder="University" value={edu.university} onChange={(e) => {
-                      const newEdu = [...formData.education]
-                      newEdu[index].university = e.target.value
-                      setFormData((prev) => ({ ...prev, education: newEdu }))
-                    }} />
-                    <Input placeholder="Graduation Year" value={edu.graduationYear} onChange={(e) => {
-                      const newEdu = [...formData.education]
-                      newEdu[index].graduationYear = e.target.value
-                      setFormData((prev) => ({ ...prev, education: newEdu }))
-                    }} />
+                    <Input
+                      placeholder="University"
+                      value={edu.university}
+                      onChange={(e) => {
+                        const newEdu = [...formData.education]
+                        newEdu[index].university = e.target.value
+                        setFormData((prev) => ({ ...prev, education: newEdu }))
+                      }}
+                    />
+                    <Input
+                      placeholder="Graduation Year"
+                      value={edu.graduationYear}
+                      onChange={(e) => {
+                        const newEdu = [...formData.education]
+                        newEdu[index].graduationYear = e.target.value
+                        setFormData((prev) => ({ ...prev, education: newEdu }))
+                      }}
+                    />
                   </div>
                 </div>
               ))}
-              <Button variant="outline" onClick={() => {
-                setFormData((prev) => ({
-                  ...prev,
-                  education: [...prev.education, { degree: "", fieldOfStudy: "", university: "", graduationYear: "" }],
-                }))
-              }} className="w-full">
+              <Button
+                variant="outline"
+                onClick={() => {
+                  setFormData((prev) => ({
+                    ...prev,
+                    education: [
+                      ...prev.education,
+                      { degree: "", fieldOfStudy: "", university: "", graduationYear: "" },
+                    ],
+                  }))
+                }}
+                className="w-full"
+              >
                 <Plus className="w-4 h-4 mr-2" /> Add Education
               </Button>
             </div>
 
             <div className="flex justify-between">
-              <Button variant="outline" onClick={() => setCurrentStep(2)}>Previous</Button>
+              <Button variant="outline" onClick={() => setCurrentStep(2)}>
+                Previous
+              </Button>
               <Button onClick={() => setCurrentStep(4)}>Next Step</Button>
             </div>
           </CardContent>
@@ -574,15 +632,32 @@ export default function ResumeGeneratorPage() {
               {formData.projects.map((project, index) => (
                 <div key={index} className="p-4 border rounded-lg space-y-3">
                   <div className="flex justify-between items-start">
-                    <Input placeholder="Project Title" value={project.title} onChange={(e) => updateProject(index, "title", e.target.value)} />
+                    <Input
+                      placeholder="Project Title"
+                      value={project.title}
+                      onChange={(e) => updateProject(index, "title", e.target.value)}
+                    />
                     <Trash2 className="w-5 h-5 text-red-500 cursor-pointer ml-2" onClick={() => removeProject(index)} />
                   </div>
-                  <Textarea placeholder="Project description" rows={2} value={project.description} onChange={(e) => updateProject(index, "description", e.target.value)} />
-                  <Input placeholder="Technologies used" value={project.technologies} onChange={(e) => updateProject(index, "technologies", e.target.value)} />
-                  <Input placeholder="Project link (optional)" value={project.link} onChange={(e) => updateProject(index, "link", e.target.value)} />
+                  <Textarea
+                    placeholder="Project description"
+                    rows={2}
+                    value={project.description}
+                    onChange={(e) => updateProject(index, "description", e.target.value)}
+                  />
+                  <Input
+                    placeholder="Technologies used"
+                    value={project.technologies}
+                    onChange={(e) => updateProject(index, "technologies", e.target.value)}
+                  />
+                  <Input
+                    placeholder="Project link (optional)"
+                    value={project.link}
+                    onChange={(e) => updateProject(index, "link", e.target.value)}
+                  />
                 </div>
               ))}
-              <Button variant="outline" onClick={addProject} className="w-full">
+              <Button variant="outline" onClick={addProject} className="w-full bg-transparent">
                 <Plus className="w-4 h-4 mr-2" /> Add Project
               </Button>
             </CardContent>
@@ -597,17 +672,36 @@ export default function ResumeGeneratorPage() {
               {formData.certificates.map((cert, index) => (
                 <div key={index} className="p-4 border rounded-lg space-y-3">
                   <div className="flex justify-between items-start">
-                    <Input placeholder="Certification Name" value={cert.name} onChange={(e) => updateCertificate(index, "name", e.target.value)} />
-                    <Trash2 className="w-5 h-5 text-red-500 cursor-pointer ml-2" onClick={() => removeCertificate(index)} />
+                    <Input
+                      placeholder="Certification Name"
+                      value={cert.name}
+                      onChange={(e) => updateCertificate(index, "name", e.target.value)}
+                    />
+                    <Trash2
+                      className="w-5 h-5 text-red-500 cursor-pointer ml-2"
+                      onClick={() => removeCertificate(index)}
+                    />
                   </div>
                   <div className="grid md:grid-cols-2 gap-4">
-                    <Input placeholder="Issuing Organization" value={cert.issuer} onChange={(e) => updateCertificate(index, "issuer", e.target.value)} />
-                    <Input placeholder="Date" value={cert.date} onChange={(e) => updateCertificate(index, "date", e.target.value)} />
+                    <Input
+                      placeholder="Issuing Organization"
+                      value={cert.issuer}
+                      onChange={(e) => updateCertificate(index, "issuer", e.target.value)}
+                    />
+                    <Input
+                      placeholder="Date"
+                      value={cert.date}
+                      onChange={(e) => updateCertificate(index, "date", e.target.value)}
+                    />
                   </div>
-                  <Input placeholder="Certificate link (optional)" value={cert.link} onChange={(e) => updateCertificate(index, "link", e.target.value)} />
+                  <Input
+                    placeholder="Certificate link (optional)"
+                    value={cert.link}
+                    onChange={(e) => updateCertificate(index, "link", e.target.value)}
+                  />
                 </div>
               ))}
-              <Button variant="outline" onClick={addCertificate} className="w-full">
+              <Button variant="outline" onClick={addCertificate} className="w-full bg-transparent">
                 <Plus className="w-4 h-4 mr-2" /> Add Certification
               </Button>
             </CardContent>
@@ -623,20 +717,34 @@ export default function ResumeGeneratorPage() {
                 <div key={index} className="p-4 border rounded-lg space-y-3">
                   <div className="flex justify-between items-start">
                     <h4 className="font-semibold">{section.name}</h4>
-                    <Trash2 className="w-5 h-5 text-red-500 cursor-pointer" onClick={() => removeCustomSection(index)} />
+                    <Trash2
+                      className="w-5 h-5 text-red-500 cursor-pointer"
+                      onClick={() => removeCustomSection(index)}
+                    />
                   </div>
-                  <Textarea placeholder="Content for this section" rows={3} value={section.content} onChange={(e) => updateCustomSection(index, "content", e.target.value)} />
+                  <Textarea
+                    placeholder="Content for this section"
+                    rows={3}
+                    value={section.content}
+                    onChange={(e) => updateCustomSection(index, "content", e.target.value)}
+                  />
                 </div>
               ))}
               <div className="flex gap-2">
-                <Input placeholder="Enter section name (e.g., Languages, Awards)" value={newSectionName} onChange={(e) => setNewSectionName(e.target.value)} />
+                <Input
+                  placeholder="Enter section name (e.g., Languages, Awards)"
+                  value={newSectionName}
+                  onChange={(e) => setNewSectionName(e.target.value)}
+                />
                 <Button onClick={addCustomSection}>Add Section</Button>
               </div>
             </CardContent>
           </Card>
 
           <div className="flex justify-between">
-            <Button variant="outline" onClick={() => setCurrentStep(3)}>Previous</Button>
+            <Button variant="outline" onClick={() => setCurrentStep(3)}>
+              Previous
+            </Button>
             <Button onClick={handleGenerate} disabled={isGenerating}>
               {isGenerating ? "Generating..." : "Generate Resume"}
             </Button>
@@ -657,9 +765,13 @@ export default function ResumeGeneratorPage() {
                 <Label>Resume Template</Label>
                 <div className="grid md:grid-cols-4 gap-4">
                   {templates.map((template) => (
-                    <div key={template.id} onClick={() => setSelectedTemplate(template.id as ResumeTemplate)} className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
-                      selectedTemplate === template.id ? "border-blue-600 bg-blue-50" : "border-gray-200"
-                    }`}>
+                    <div
+                      key={template.id}
+                      onClick={() => setSelectedTemplate(template.id as ResumeTemplate)}
+                      className={`p-4 border-2 rounded-lg cursor-pointer transition-all ${
+                        selectedTemplate === template.id ? "border-blue-600 bg-blue-50" : "border-gray-200"
+                      }`}
+                    >
                       <p className="font-semibold">{template.name}</p>
                       <p className="text-sm text-gray-600">{template.desc}</p>
                     </div>
@@ -695,13 +807,18 @@ export default function ResumeGeneratorPage() {
               <div className="bg-white border rounded-lg p-8 shadow-sm max-h-[600px] overflow-y-auto">
                 {photoPreview && (
                   <div className="flex justify-center mb-6">
-                    <img src={photoPreview || "/placeholder.svg"} alt="Profile" className="w-24 h-24 rounded-full object-cover" />
+                    <img
+                      src={photoPreview || "/placeholder.svg"}
+                      alt="Profile"
+                      className="w-24 h-24 rounded-full object-cover"
+                    />
                   </div>
                 )}
                 <h2 className="text-2xl font-bold text-center mb-1">{generatedResume.personalInfo.fullName}</h2>
                 <p className="text-center text-gray-600 mb-4">{generatedResume.targetRole}</p>
                 <div className="text-center text-sm text-gray-500 mb-6">
-                  {generatedResume.personalInfo.email} • {generatedResume.personalInfo.phone} • {generatedResume.personalInfo.location}
+                  {generatedResume.personalInfo.email} • {generatedResume.personalInfo.phone} •{" "}
+                  {generatedResume.personalInfo.location}
                   {generatedResume.personalInfo.linkedIn && <p>LinkedIn: {generatedResume.personalInfo.linkedIn}</p>}
                   {generatedResume.personalInfo.github && <p>GitHub: {generatedResume.personalInfo.github}</p>}
                 </div>
@@ -723,58 +840,70 @@ export default function ResumeGeneratorPage() {
                 {generatedResume.experience.length > 0 && (
                   <div className="mb-4">
                     <h3 className="font-bold border-b pb-1">PROFESSIONAL EXPERIENCE</h3>
-                    {generatedResume.experience.map((exp: any, i: number) => (
-                      (exp.title || exp.company) && (
-                        <div key={i} className="text-sm mt-2">
-                          <p className="font-semibold">{exp.title} - {exp.company}</p>
-                          <p className="text-gray-600">{exp.duration}</p>
-                          <p>{exp.description}</p>
-                        </div>
-                      )
-                    ))}
+                    {generatedResume.experience.map(
+                      (exp: any, i: number) =>
+                        (exp.title || exp.company) && (
+                          <div key={i} className="text-sm mt-2">
+                            <p className="font-semibold">
+                              {exp.title} - {exp.company}
+                            </p>
+                            <p className="text-gray-600">{exp.duration}</p>
+                            <p>{exp.description}</p>
+                          </div>
+                        ),
+                    )}
                   </div>
                 )}
 
                 {generatedResume.education.length > 0 && (
                   <div className="mb-4">
                     <h3 className="font-bold border-b pb-1">EDUCATION</h3>
-                    {generatedResume.education.map((edu: any, i: number) => (
-                      (edu.degree || edu.university) && (
-                        <div key={i} className="text-sm mt-2">
-                          <p className="font-semibold">{edu.degree} in {edu.fieldOfStudy}</p>
-                          <p>{edu.university} - {edu.graduationYear}</p>
-                        </div>
-                      )
-                    ))}
+                    {generatedResume.education.map(
+                      (edu: any, i: number) =>
+                        (edu.degree || edu.university) && (
+                          <div key={i} className="text-sm mt-2">
+                            <p className="font-semibold">
+                              {edu.degree} in {edu.fieldOfStudy}
+                            </p>
+                            <p>
+                              {edu.university} - {edu.graduationYear}
+                            </p>
+                          </div>
+                        ),
+                    )}
                   </div>
                 )}
 
                 {generatedResume.projects.length > 0 && (
                   <div className="mb-4">
                     <h3 className="font-bold border-b pb-1">PROJECTS</h3>
-                    {generatedResume.projects.map((proj: any, i: number) => (
-                      proj.title && (
-                        <div key={i} className="text-sm mt-2">
-                          <p className="font-semibold">{proj.title}</p>
-                          <p>{proj.description}</p>
-                          <p className="text-gray-600">Tech: {proj.technologies}</p>
-                        </div>
-                      )
-                    ))}
+                    {generatedResume.projects.map(
+                      (proj: any, i: number) =>
+                        proj.title && (
+                          <div key={i} className="text-sm mt-2">
+                            <p className="font-semibold">{proj.title}</p>
+                            <p>{proj.description}</p>
+                            <p className="text-gray-600">Tech: {proj.technologies}</p>
+                          </div>
+                        ),
+                    )}
                   </div>
                 )}
 
                 {generatedResume.certificates.length > 0 && (
                   <div className="mb-4">
                     <h3 className="font-bold border-b pb-1">CERTIFICATIONS</h3>
-                    {generatedResume.certificates.map((cert: any, i: number) => (
-                      cert.name && (
-                        <div key={i} className="text-sm mt-2">
-                          <p className="font-semibold">{cert.name}</p>
-                          <p className="text-gray-600">{cert.issuer} - {cert.date}</p>
-                        </div>
-                      )
-                    ))}
+                    {generatedResume.certificates.map(
+                      (cert: any, i: number) =>
+                        cert.name && (
+                          <div key={i} className="text-sm mt-2">
+                            <p className="font-semibold">{cert.name}</p>
+                            <p className="text-gray-600">
+                              {cert.issuer} - {cert.date}
+                            </p>
+                          </div>
+                        ),
+                    )}
                   </div>
                 )}
               </div>

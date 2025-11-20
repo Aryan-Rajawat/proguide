@@ -7,7 +7,7 @@ import { Badge } from "@/components/ui/badge"
 import { Progress } from "@/components/ui/progress"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 import { Textarea } from "@/components/ui/textarea"
-import { MessageSquare, Play, Pause, RotateCcw, CheckCircle, Clock, Target, TrendingUp, Lightbulb } from 'lucide-react'
+import { MessageSquare, Play, Pause, RotateCcw, CheckCircle, Clock, Target, TrendingUp, Lightbulb } from "lucide-react"
 
 export default function MockInterviewPage() {
   const [interviewType, setInterviewType] = useState("")
@@ -60,6 +60,35 @@ export default function MockInterviewPage() {
   const finishInterview = () => {
     setIsInterviewStarted(false)
     setShowResults(true)
+
+    // Save interview session to localStorage with real data
+    const interviewSessions = JSON.parse(localStorage.getItem("interviewSessions") || "[]")
+    const mockResults = generateMockResults()
+
+    const newSession = {
+      id: Date.now().toString(),
+      type: interviewType,
+      targetRole: targetRole,
+      score: mockResults.overallScore,
+      questionsAsked: currentQuestion + 1,
+      totalQuestions: getCurrentQuestions().length,
+      answers: answers,
+      results: mockResults,
+      completedAt: new Date().toISOString(),
+    }
+
+    interviewSessions.push(newSession)
+    localStorage.setItem("interviewSessions", JSON.stringify(interviewSessions))
+
+    const userActivity = JSON.parse(localStorage.getItem("userActivity") || "[]")
+    userActivity.push({
+      timestamp: new Date().toISOString(),
+      activity: `Completed ${interviewType.replace("_", " ")} interview - Score: ${mockResults.overallScore}/100`,
+      type: "interview_completed",
+      interviewId: newSession.id,
+      score: mockResults.overallScore,
+    })
+    localStorage.setItem("userActivity", JSON.stringify(userActivity))
   }
 
   const getCurrentQuestions = () => {
@@ -68,15 +97,16 @@ export default function MockInterviewPage() {
 
   const generateMockResults = () => {
     // Calculate answer quality based on word count and structure
-    const answerQuality = answers.reduce((sum, answer) => {
-      const wordCount = answer.trim().split(/\s+/).length
-      // Higher scores for longer, more detailed answers
-      const qualityScore = Math.min(wordCount / 30, 1)
-      return sum + qualityScore
-    }, 0) / (answers.length || 1)
+    const answerQuality =
+      answers.reduce((sum, answer) => {
+        const wordCount = answer.trim().split(/\s+/).length
+        // Higher scores for longer, more detailed answers
+        const qualityScore = Math.min(wordCount / 30, 1)
+        return sum + qualityScore
+      }, 0) / (answers.length || 1)
 
     // Base score calculation with reduced randomness for consistency
-    const baseScore = 65 + (answerQuality * 30)
+    const baseScore = 65 + answerQuality * 30
     const finalScore = Math.min(Math.max(Math.round(baseScore), 60), 100)
 
     return {
@@ -85,20 +115,20 @@ export default function MockInterviewPage() {
         "Clear and concise communication",
         "Strong problem-solving approach",
         "Good technical understanding",
-        "Relevant examples provided"
+        "Relevant examples provided",
       ].slice(0, 3),
       improvements: [
         "Provide more specific examples",
         "Structure answers using STAR method",
         "Show more enthusiasm for the role",
-        "Include quantifiable results"
+        "Include quantifiable results",
       ].slice(0, 3),
       questionScores: [
         { question: "Technical concepts", score: Math.min(finalScore + 5, 100) },
         { question: "Problem solving", score: finalScore },
         { question: "Communication", score: Math.min(finalScore + 3, 100) },
         { question: "Cultural fit", score: Math.min(finalScore - 3, 100) },
-      ].map(item => ({ ...item, score: Math.round(item.score) }))
+      ].map((item) => ({ ...item, score: Math.round(item.score) })),
     }
   }
 
