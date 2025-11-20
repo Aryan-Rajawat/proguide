@@ -7,10 +7,9 @@ import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Textarea } from "@/components/ui/textarea"
-import { Brain, Eye, EyeOff, AlertCircle, CheckCircle } from 'lucide-react'
+import { Brain, Eye, EyeOff, AlertCircle, CheckCircle } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 
 export default function SignUpPage() {
   const [formData, setFormData] = useState({
@@ -19,7 +18,6 @@ export default function SignUpPage() {
     email: "",
     password: "",
     confirmPassword: "",
-    professionalSummary: "",
   })
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
@@ -39,7 +37,7 @@ export default function SignUpPage() {
       uppercase: /[A-Z]/.test(pwd),
       lowercase: /[a-z]/.test(pwd),
       number: /[0-9]/.test(pwd),
-      special: /[!@#$%^&*()_+\-=\[\]{};':"\\|,.<>\/?]/.test(pwd),
+      special: /[!@#$%^&*()_+\-=[\]{};':"\\|,.<>/?]/.test(pwd),
     }
     setPasswordChecks(checks)
     return Object.values(checks).every((check) => check)
@@ -87,8 +85,8 @@ export default function SignUpPage() {
         firstName: formData.firstName,
         lastName: formData.lastName,
         fullName: `${formData.firstName} ${formData.lastName}`,
+        name: `${formData.firstName} ${formData.lastName}`,
         email: formData.email,
-        professionalSummary: formData.professionalSummary,
         joinDate: new Date().toISOString(),
         profileComplete: true,
         lastLogin: new Date().toISOString(),
@@ -214,9 +212,7 @@ export default function SignUpPage() {
                     ) : (
                       <AlertCircle className="w-4 h-4 text-red-600" />
                     )}
-                    <span className={passwordChecks.number ? "text-green-600" : "text-red-600"}>
-                      One number
-                    </span>
+                    <span className={passwordChecks.number ? "text-green-600" : "text-red-600"}>One number</span>
                   </div>
                   <div className="flex items-center gap-2">
                     {passwordChecks.special ? (
@@ -251,23 +247,7 @@ export default function SignUpPage() {
               )}
             </div>
 
-            <div className="space-y-2">
-              <Label htmlFor="professionalSummary">Professional Summary</Label>
-              <Textarea
-                id="professionalSummary"
-                name="professionalSummary"
-                placeholder="Tell us about yourself and your career goals..."
-                rows={3}
-                value={formData.professionalSummary}
-                onChange={handleInputChange}
-              />
-            </div>
-
-            <Button
-              type="submit"
-              className="w-full"
-              disabled={isLoading || !allPasswordChecksPassed}
-            >
+            <Button type="submit" className="w-full" disabled={isLoading || !allPasswordChecksPassed}>
               {isLoading ? "Creating account..." : "Create Profile"}
             </Button>
           </form>

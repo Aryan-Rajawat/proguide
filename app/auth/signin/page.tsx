@@ -1,15 +1,16 @@
 "use client"
 
-import type React from "react"
-
 import { useState } from "react"
+
+import type React from "react"
+import { useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
-import { Brain, Eye, EyeOff, AlertCircle } from 'lucide-react'
+import { Brain, Eye, EyeOff, AlertCircle } from "lucide-react"
 import Link from "next/link"
-import { useRouter } from 'next/navigation'
+import { useRouter } from "next/navigation"
 
 export default function SignInPage() {
   const [email, setEmail] = useState("")
@@ -17,7 +18,18 @@ export default function SignInPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [passwordError, setPasswordError] = useState("")
+  const [rememberMe, setRememberMe] = useState(false)
   const router = useRouter()
+
+  useEffect(() => {
+    const savedCredentials = localStorage.getItem("savedCredentials")
+    if (savedCredentials) {
+      const { email: savedEmail, password: savedPassword } = JSON.parse(savedCredentials)
+      setEmail(savedEmail)
+      setPassword(savedPassword)
+      setRememberMe(true)
+    }
+  }, [])
 
   const handleSignIn = async (e: React.FormEvent) => {
     e.preventDefault()
@@ -31,9 +43,18 @@ export default function SignInPage() {
         return
       }
 
+      if (rememberMe) {
+        localStorage.setItem("savedCredentials", JSON.stringify({ email, password }))
+      } else {
+        localStorage.removeItem("savedCredentials")
+      }
+
       const userData = {
         email: email,
-        name: email.split("@")[0].replace(/[._]/g, " ").replace(/\b\w/g, (l) => l.toUpperCase()),
+        name: email
+          .split("@")[0]
+          .replace(/[._]/g, " ")
+          .replace(/\b\w/g, (l) => l.toUpperCase()),
         joinDate: new Date().toISOString(),
         profileComplete: false,
         lastLogin: new Date().toISOString(),
@@ -45,7 +66,7 @@ export default function SignInPage() {
       const activityList = existingActivity ? JSON.parse(existingActivity) : []
       activityList.push({
         timestamp: new Date().toISOString(),
-        activity: `Logged in to ProGuide`
+        activity: `Logged in to ProGuide`,
       })
       localStorage.setItem("userActivity", JSON.stringify(activityList))
 
@@ -108,12 +129,26 @@ export default function SignInPage() {
                 </Button>
               </div>
               {passwordError && (
-                <div className="flex items-gap-2 p-2 bg-red-50 rounded border border-red-200">
+                <div className="flex items-center gap-2 p-2 bg-red-50 rounded border border-red-200">
                   <AlertCircle className="w-4 h-4 text-red-600 flex-shrink-0 mt-0.5" />
                   <p className="text-xs text-red-600">{passwordError}</p>
                 </div>
               )}
             </div>
+
+            <div className="flex items-center gap-2">
+              <input
+                type="checkbox"
+                id="rememberMe"
+                checked={rememberMe}
+                onChange={(e) => setRememberMe(e.target.checked)}
+                className="w-4 h-4 rounded border-gray-300"
+              />
+              <Label htmlFor="rememberMe" className="text-sm font-normal cursor-pointer">
+                Remember me
+              </Label>
+            </div>
+
             <Button type="submit" className="w-full" disabled={isLoading}>
               {isLoading ? "Signing in..." : "Sign In"}
             </Button>
