@@ -25,6 +25,7 @@ export default function SignUpPage() {
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [passwordError, setPasswordError] = useState("")
+  const [emailError, setEmailError] = useState("")
   const [passwordChecks, setPasswordChecks] = useState({
     length: false,
     uppercase: false,
@@ -66,10 +67,22 @@ export default function SignUpPage() {
         })
       }
     }
+
+    if (name === "email") {
+      setEmailError("")
+    }
   }
 
   const handleNextStep = () => {
     if (step === 1) {
+      const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]")
+      const existingUser = registeredUsers.find((user: any) => user.email === formData.email)
+
+      if (existingUser) {
+        setEmailError("An account with this email already exists. Please sign in instead.")
+        return
+      }
+
       if (formData.password !== formData.confirmPassword) {
         setPasswordError("Passwords do not match")
         return
@@ -93,6 +106,7 @@ export default function SignUpPage() {
         .filter((s: string) => s.length > 0)
 
       const userData = {
+        id: Date.now().toString(),
         firstName: formData.firstName,
         lastName: formData.lastName,
         fullName: `${formData.firstName} ${formData.lastName}`,
@@ -105,7 +119,23 @@ export default function SignUpPage() {
         skills: skillsArray,
       }
 
+      const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]")
+      registeredUsers.push(userData)
+      localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers))
+
       localStorage.setItem("currentUser", JSON.stringify(userData))
+
+      const activityKey = `userActivity_${userData.email}`
+      const initialActivity = [
+        {
+          timestamp: new Date().toISOString(),
+          activity: "Created ProGuide account",
+          type: "signup",
+        },
+      ]
+      localStorage.setItem(activityKey, JSON.stringify(initialActivity))
+      localStorage.setItem("userActivity", JSON.stringify(initialActivity))
+
       setIsLoading(false)
       router.push("/dashboard")
     }, 1500)
@@ -176,6 +206,12 @@ export default function SignUpPage() {
                     onChange={handleInputChange}
                     required
                   />
+                  {emailError && (
+                    <p className="text-xs text-red-600 flex items-center gap-1">
+                      <AlertCircle className="w-3 h-3" />
+                      {emailError}
+                    </p>
+                  )}
                 </div>
 
                 <div className="space-y-2">

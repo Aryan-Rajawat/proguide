@@ -8,6 +8,20 @@
     "lint": "next lint",
     "start": "next start"
   },
+  "resolutions": {
+    "@ai-sdk/openai": "1.1.9",
+    "@supabase/ssr": "0.5.2",
+    "@supabase/supabase-js": "2.46.2",
+    "ai": "3.4.33",
+    "zod": "3.23.8"
+  },
+  "overrides": {
+    "@ai-sdk/openai": "1.1.9",
+    "@supabase/ssr": "0.5.2",
+    "@supabase/supabase-js": "2.46.2",
+    "ai": "3.4.33",
+    "zod": "3.23.8"
+  },
   "dependencies": {
     "@ai-sdk/openai": "latest",
     "@hookform/resolvers": "^3.9.1",
@@ -38,7 +52,7 @@
     "@radix-ui/react-toggle": "1.1.1",
     "@radix-ui/react-toggle-group": "1.1.1",
     "@radix-ui/react-tooltip": "1.1.6",
-    "@supabase/ssr": "latest",
+    "@supabase/ssr": "0.5.2",
     "@supabase/supabase-js": "latest",
     "ai": "latest",
     "autoprefixer": "^10.4.20",
@@ -61,7 +75,7 @@
     "tailwind-merge": "^2.5.5",
     "tailwindcss-animate": "^1.0.7",
     "vaul": "^0.9.6",
-    "zod": "^3.23.8"
+    "zod": "3.23.8"
   },
   "devDependencies": {
     "@types/node": "^22",
@@ -70,5 +84,15 @@
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
+  },
+  "packageManager": "pnpm@9.15.0",
+  "pnpm": {
+    "overrides": {
+      "@ai-sdk/openai": "1.1.9",
+      "@supabase/ssr": "0.5.2",
+      "@supabase/supabase-js": "2.46.2",
+      "ai": "3.4.33",
+      "zod": "3.23.8"
+    }
   }
 }

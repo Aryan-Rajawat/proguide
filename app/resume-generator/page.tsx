@@ -2,7 +2,7 @@
 
 import type React from "react"
 
-import { useState } from "react"
+import { useState, useEffect } from "react"
 import { Button } from "@/components/ui/button"
 import { Card, CardContent, CardDescription, CardHeader, CardTitle } from "@/components/ui/card"
 import { Input } from "@/components/ui/input"
@@ -15,14 +15,20 @@ import { Download, Plus, X, Upload, Trash2 } from "lucide-react"
 type ResumeTemplate = "modern" | "classic" | "creative" | "minimal"
 type ResumeFormat = "pdf" | "txt" | "docx"
 
+interface CustomSection {
+  name: string
+  content: string
+}
+
 export default function ResumeGeneratorPage() {
   const [currentStep, setCurrentStep] = useState(1)
   const [isGenerating, setIsGenerating] = useState(false)
   const [selectedTemplate, setSelectedTemplate] = useState<ResumeTemplate>("modern")
-  const [selectedFormat, setSelectedFormat] = useState<ResumeFormat>("pdf")
+  const [selectedFormat, setSelectedFormat] = useState<ResumeFormat>("txt")
   const [photoPreview, setPhotoPreview] = useState<string>("")
-  const [customSections, setCustomSections] = useState<Array<{ name: string; content: string }>>([])
+  const [customSections, setCustomSections] = useState<CustomSection[]>([])
   const [newSectionName, setNewSectionName] = useState("")
+  const [currentUserEmail, setCurrentUserEmail] = useState("")
 
   const [formData, setFormData] = useState({
     personalInfo: {
@@ -37,14 +43,23 @@ export default function ResumeGeneratorPage() {
     },
     targetRole: "",
     industry: "",
-    experience: [],
-    education: [],
-    skills: [],
-    projects: [],
-    certificates: [],
+    experience: [] as any[],
+    education: [] as any[],
+    skills: [] as string[],
+    projects: [] as any[],
+    certificates: [] as any[],
     professionalSummary: "",
   })
   const [generatedResume, setGeneratedResume] = useState<typeof formData | null>(null)
+  const [generatedCustomSections, setGeneratedCustomSections] = useState<CustomSection[]>([])
+
+  useEffect(() => {
+    const currentUser = localStorage.getItem("currentUser")
+    if (currentUser) {
+      const user = JSON.parse(currentUser)
+      setCurrentUserEmail(user.email)
+    }
+  }, [])
 
   const handlePhotoUpload = (e: React.ChangeEvent<HTMLInputElement>) => {
     const file = e.target.files?.[0]
@@ -139,87 +154,97 @@ export default function ResumeGeneratorPage() {
     setCustomSections(customSections.filter((_, i) => i !== index))
   }
 
-  const handleGenerate = async () => {
-    setIsGenerating(true)
-    setTimeout(() => {
-      setGeneratedResume({ ...formData })
-      setIsGenerating(false)
-      setCurrentStep(5)
-
-      // Save to localStorage
-      const resumes = JSON.parse(localStorage.getItem("resumes") || "[]")
-      const newResume = {
-        id: Date.now().toString(),
-        title: formData.targetRole ? `${formData.targetRole} Resume` : "My Resume",
-        content: generateResumeText(formData),
-        formData: formData,
-        template: selectedTemplate,
-        createdDate: new Date().toISOString(),
-        lastModified: new Date().toISOString(),
-      }
-      resumes.push(newResume)
-      localStorage.setItem("resumes", JSON.stringify(resumes))
-
-      const userActivity = JSON.parse(localStorage.getItem("userActivity") || "[]")
-      userActivity.push({
-        timestamp: new Date().toISOString(),
-        activity: `Created resume: ${newResume.title}`,
-        type: "resume_created",
-        resumeId: newResume.id,
-      })
-      localStorage.setItem("userActivity", JSON.stringify(userActivity))
-    }, 2000)
-  }
-
-  const generateResumeText = (data: typeof formData): string => {
+  const generateResumeText = (data: typeof formData, sections: CustomSection[]): string => {
     let text = ""
+    text += "=".repeat(50) + "\n"
     text += data.personalInfo.fullName.toUpperCase() + "\n"
     text += data.targetRole + "\n"
-    text += `${data.personalInfo.email} • ${data.personalInfo.phone} • ${data.personalInfo.location}\n`
+    text += "=".repeat(50) + "\n\n"
+
+    text += `Email: ${data.personalInfo.email}\n`
+    text += `Phone: ${data.personalInfo.phone}\n`
+    text += `Location: ${data.personalInfo.location}\n`
     if (data.personalInfo.linkedIn) text += `LinkedIn: ${data.personalInfo.linkedIn}\n`
     if (data.personalInfo.github) text += `GitHub: ${data.personalInfo.github}\n`
     text += "\n"
 
     if (data.professionalSummary) {
-      text += "PROFESSIONAL SUMMARY\n" + data.professionalSummary + "\n\n"
+      text += "-".repeat(30) + "\n"
+      text += "PROFESSIONAL SUMMARY\n"
+      text += "-".repeat(30) + "\n"
+      text += data.professionalSummary + "\n\n"
     }
 
     if (data.skills.length > 0) {
-      text += "TECHNICAL SKILLS\n" + data.skills.join(", ") + "\n\n"
+      text += "-".repeat(30) + "\n"
+      text += "TECHNICAL SKILLS\n"
+      text += "-".repeat(30) + "\n"
+      text += data.skills.join(" | ") + "\n\n"
     }
 
     if (data.experience.length > 0) {
+      text += "-".repeat(30) + "\n"
       text += "PROFESSIONAL EXPERIENCE\n"
+      text += "-".repeat(30) + "\n"
       data.experience.forEach((exp: any) => {
         if (exp.title || exp.company) {
-          text += `${exp.title} - ${exp.company}\n${exp.duration}\n${exp.description}\n\n`
+          text += `\n${exp.title} at ${exp.company}\n`
+          text += `${exp.duration}\n`
+          text += `${exp.description}\n`
         }
       })
+      text += "\n"
     }
 
     if (data.education.length > 0) {
+      text += "-".repeat(30) + "\n"
       text += "EDUCATION\n"
+      text += "-".repeat(30) + "\n"
       data.education.forEach((edu: any) => {
         if (edu.degree || edu.university) {
-          text += `${edu.degree} in ${edu.fieldOfStudy}\n${edu.university}, ${edu.graduationYear}\n\n`
+          text += `\n${edu.degree} in ${edu.fieldOfStudy}\n`
+          text += `${edu.university} - ${edu.graduationYear}\n`
         }
       })
+      text += "\n"
     }
 
     if (data.projects.length > 0) {
+      text += "-".repeat(30) + "\n"
       text += "PROJECTS\n"
+      text += "-".repeat(30) + "\n"
       data.projects.forEach((proj: any) => {
         if (proj.title) {
-          text += `${proj.title}\n${proj.description}\nTechnologies: ${proj.technologies}\n\n`
+          text += `\n${proj.title}\n`
+          text += `${proj.description}\n`
+          text += `Technologies: ${proj.technologies}\n`
+          if (proj.link) text += `Link: ${proj.link}\n`
         }
       })
+      text += "\n"
     }
 
     if (data.certificates.length > 0) {
+      text += "-".repeat(30) + "\n"
       text += "CERTIFICATIONS\n"
+      text += "-".repeat(30) + "\n"
       data.certificates.forEach((cert: any) => {
         if (cert.name) {
-          text += `${cert.name} - ${cert.issuer} (${cert.date})\n\n`
+          text += `\n${cert.name}\n`
+          text += `${cert.issuer} - ${cert.date}\n`
+          if (cert.link) text += `Link: ${cert.link}\n`
+        }
+      })
+      text += "\n"
+    }
+
+    if (sections.length > 0) {
+      sections.forEach((section) => {
+        if (section.content) {
+          text += "-".repeat(30) + "\n"
+          text += section.name.toUpperCase() + "\n"
+          text += "-".repeat(30) + "\n"
+          text += section.content + "\n\n"
         }
       })
     }
@@ -227,17 +252,61 @@ export default function ResumeGeneratorPage() {
     return text
   }
 
+  const handleGenerate = async () => {
+    setIsGenerating(true)
+    setTimeout(() => {
+      setGeneratedResume({ ...formData })
+      setGeneratedCustomSections([...customSections])
+      setIsGenerating(false)
+      setCurrentStep(5)
+
+      // Save to localStorage with user email
+      const resumes = JSON.parse(localStorage.getItem("resumes") || "[]")
+      const newResume = {
+        id: Date.now().toString(),
+        userEmail: currentUserEmail,
+        title: formData.targetRole ? `${formData.targetRole} Resume` : "My Resume",
+        content: generateResumeText(formData, customSections),
+        formData: formData,
+        customSections: customSections,
+        template: selectedTemplate,
+        createdDate: new Date().toISOString(),
+        lastModified: new Date().toISOString(),
+      }
+      resumes.push(newResume)
+      localStorage.setItem("resumes", JSON.stringify(resumes))
+
+      if (currentUserEmail) {
+        const activityKey = `userActivity_${currentUserEmail}`
+        const userActivity = JSON.parse(localStorage.getItem(activityKey) || "[]")
+        userActivity.unshift({
+          timestamp: new Date().toISOString(),
+          activity: `Created resume: ${newResume.title}`,
+          type: "resume_created",
+          resumeId: newResume.id,
+        })
+        localStorage.setItem(activityKey, JSON.stringify(userActivity.slice(0, 20)))
+        localStorage.setItem("userActivity", JSON.stringify(userActivity.slice(0, 20)))
+      }
+    }, 2000)
+  }
+
   const downloadResume = () => {
     if (!generatedResume) return
-    const text = generateResumeText(generatedResume)
-    const element = document.createElement("a")
-    const file = new Blob([text], { type: "text/plain;charset=utf-8" })
-    element.href = URL.createObjectURL(file)
-    element.download = `${generatedResume.personalInfo.fullName || "Resume"}.${selectedFormat}`
-    document.body.appendChild(element)
-    element.click()
-    document.body.removeChild(element)
-    URL.revokeObjectURL(element.href)
+
+    const text = generateResumeText(generatedResume, generatedCustomSections)
+    const fileName = `${generatedResume.personalInfo.fullName || "Resume"}_${selectedTemplate}`
+
+    // Create blob and download
+    const blob = new Blob([text], { type: "text/plain;charset=utf-8" })
+    const url = window.URL.createObjectURL(blob)
+    const link = document.createElement("a")
+    link.href = url
+    link.download = `${fileName}.txt`
+    document.body.appendChild(link)
+    link.click()
+    document.body.removeChild(link)
+    window.URL.revokeObjectURL(url)
   }
 
   const steps = [
@@ -530,7 +599,7 @@ export default function ResumeGeneratorPage() {
               </div>
               <div className="flex gap-2">
                 <Input
-                  placeholder="Add a skill"
+                  placeholder="Add a skill and press Enter"
                   onKeyPress={(e) => {
                     if (e.key === "Enter") {
                       const skill = (e.target as HTMLInputElement).value
@@ -710,20 +779,20 @@ export default function ResumeGeneratorPage() {
           <Card>
             <CardHeader>
               <CardTitle>Custom Sections</CardTitle>
-              <CardDescription>Add any custom section you want</CardDescription>
+              <CardDescription>Add any custom section you want (e.g., Languages, Awards, Hobbies)</CardDescription>
             </CardHeader>
             <CardContent className="space-y-4">
               {customSections.map((section, index) => (
                 <div key={index} className="p-4 border rounded-lg space-y-3">
                   <div className="flex justify-between items-start">
-                    <h4 className="font-semibold">{section.name}</h4>
+                    <h4 className="font-semibold text-lg">{section.name}</h4>
                     <Trash2
                       className="w-5 h-5 text-red-500 cursor-pointer"
                       onClick={() => removeCustomSection(index)}
                     />
                   </div>
                   <Textarea
-                    placeholder="Content for this section"
+                    placeholder={`Enter content for ${section.name}...`}
                     rows={3}
                     value={section.content}
                     onChange={(e) => updateCustomSection(index, "content", e.target.value)}
@@ -735,6 +804,7 @@ export default function ResumeGeneratorPage() {
                   placeholder="Enter section name (e.g., Languages, Awards)"
                   value={newSectionName}
                   onChange={(e) => setNewSectionName(e.target.value)}
+                  onKeyPress={(e) => e.key === "Enter" && addCustomSection()}
                 />
                 <Button onClick={addCustomSection}>Add Section</Button>
               </div>
@@ -757,7 +827,7 @@ export default function ResumeGeneratorPage() {
         <div className="space-y-6">
           <Card>
             <CardHeader>
-              <CardTitle>Choose Template & Format</CardTitle>
+              <CardTitle>Choose Template & Download</CardTitle>
               <CardDescription>Select how you want your resume to look</CardDescription>
             </CardHeader>
             <CardContent className="space-y-6">
@@ -779,22 +849,8 @@ export default function ResumeGeneratorPage() {
                 </div>
               </div>
 
-              <div className="space-y-2">
-                <Label>Download Format</Label>
-                <Select value={selectedFormat} onValueChange={(value) => setSelectedFormat(value as ResumeFormat)}>
-                  <SelectTrigger>
-                    <SelectValue />
-                  </SelectTrigger>
-                  <SelectContent>
-                    <SelectItem value="pdf">PDF</SelectItem>
-                    <SelectItem value="txt">Text</SelectItem>
-                    <SelectItem value="docx">Word Document</SelectItem>
-                  </SelectContent>
-                </Select>
-              </div>
-
-              <Button onClick={downloadResume} className="w-full">
-                <Download className="w-4 h-4 mr-2" /> Download Resume
+              <Button onClick={downloadResume} className="w-full" size="lg">
+                <Download className="w-4 h-4 mr-2" /> Download Resume (.txt)
               </Button>
             </CardContent>
           </Card>
@@ -817,7 +873,7 @@ export default function ResumeGeneratorPage() {
                 <h2 className="text-2xl font-bold text-center mb-1">{generatedResume.personalInfo.fullName}</h2>
                 <p className="text-center text-gray-600 mb-4">{generatedResume.targetRole}</p>
                 <div className="text-center text-sm text-gray-500 mb-6">
-                  {generatedResume.personalInfo.email} • {generatedResume.personalInfo.phone} •{" "}
+                  {generatedResume.personalInfo.email} | {generatedResume.personalInfo.phone} |{" "}
                   {generatedResume.personalInfo.location}
                   {generatedResume.personalInfo.linkedIn && <p>LinkedIn: {generatedResume.personalInfo.linkedIn}</p>}
                   {generatedResume.personalInfo.github && <p>GitHub: {generatedResume.personalInfo.github}</p>}
@@ -833,7 +889,7 @@ export default function ResumeGeneratorPage() {
                 {generatedResume.skills.length > 0 && (
                   <div className="mb-4">
                     <h3 className="font-bold border-b pb-1">TECHNICAL SKILLS</h3>
-                    <p className="text-sm mt-2">{generatedResume.skills.join(", ")}</p>
+                    <p className="text-sm mt-2">{generatedResume.skills.join(" | ")}</p>
                   </div>
                 )}
 
@@ -845,7 +901,7 @@ export default function ResumeGeneratorPage() {
                         (exp.title || exp.company) && (
                           <div key={i} className="text-sm mt-2">
                             <p className="font-semibold">
-                              {exp.title} - {exp.company}
+                              {exp.title} at {exp.company}
                             </p>
                             <p className="text-gray-600">{exp.duration}</p>
                             <p>{exp.description}</p>
@@ -883,7 +939,7 @@ export default function ResumeGeneratorPage() {
                           <div key={i} className="text-sm mt-2">
                             <p className="font-semibold">{proj.title}</p>
                             <p>{proj.description}</p>
-                            <p className="text-gray-600">Tech: {proj.technologies}</p>
+                            <p className="text-gray-600">Technologies: {proj.technologies}</p>
                           </div>
                         ),
                     )}
@@ -906,6 +962,17 @@ export default function ResumeGeneratorPage() {
                     )}
                   </div>
                 )}
+
+                {generatedCustomSections.length > 0 &&
+                  generatedCustomSections.map(
+                    (section, i) =>
+                      section.content && (
+                        <div key={i} className="mb-4">
+                          <h3 className="font-bold border-b pb-1">{section.name.toUpperCase()}</h3>
+                          <p className="text-sm mt-2 whitespace-pre-wrap">{section.content}</p>
+                        </div>
+                      ),
+                  )}
               </div>
             </CardContent>
           </Card>

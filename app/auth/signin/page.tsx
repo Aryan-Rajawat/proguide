@@ -49,26 +49,54 @@ export default function SignInPage() {
         localStorage.removeItem("savedCredentials")
       }
 
-      const userData = {
-        email: email,
-        name: email
-          .split("@")[0]
-          .replace(/[._]/g, " ")
-          .replace(/\b\w/g, (l) => l.toUpperCase()),
-        joinDate: new Date().toISOString(),
-        profileComplete: false,
-        lastLogin: new Date().toISOString(),
+      const registeredUsers = JSON.parse(localStorage.getItem("registeredUsers") || "[]")
+      const existingUser = registeredUsers.find((user: any) => user.email === email)
+
+      let userData
+      if (existingUser) {
+        userData = {
+          ...existingUser,
+          lastLogin: new Date().toISOString(),
+        }
+        // Update the user in registered users
+        const updatedUsers = registeredUsers.map((user: any) => (user.email === email ? userData : user))
+        localStorage.setItem("registeredUsers", JSON.stringify(updatedUsers))
+      } else {
+        userData = {
+          id: Date.now().toString(),
+          email: email,
+          name: email
+            .split("@")[0]
+            .replace(/[._]/g, " ")
+            .replace(/\b\w/g, (l) => l.toUpperCase()),
+          joinDate: new Date().toISOString(),
+          profileComplete: false,
+          lastLogin: new Date().toISOString(),
+          careerGoals: "",
+          skills: [],
+        }
+        // Add to registered users
+        registeredUsers.push(userData)
+        localStorage.setItem("registeredUsers", JSON.stringify(registeredUsers))
       }
 
       localStorage.setItem("currentUser", JSON.stringify(userData))
 
-      const existingActivity = localStorage.getItem("userActivity")
+      const activityKey = `userActivity_${userData.email}`
+      const existingActivity = localStorage.getItem(activityKey)
       const activityList = existingActivity ? JSON.parse(existingActivity) : []
-      activityList.push({
+
+      activityList.unshift({
         timestamp: new Date().toISOString(),
         activity: `Logged in to ProGuide`,
+        type: "login",
       })
-      localStorage.setItem("userActivity", JSON.stringify(activityList))
+
+      // Keep only last 20 activities
+      const trimmedActivity = activityList.slice(0, 20)
+      localStorage.setItem(activityKey, JSON.stringify(trimmedActivity))
+      // Also set as current activity for dashboard
+      localStorage.setItem("userActivity", JSON.stringify(trimmedActivity))
 
       setIsLoading(false)
       router.push("/dashboard")

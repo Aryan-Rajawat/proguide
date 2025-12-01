@@ -20,7 +20,6 @@ import {
   Plus,
 } from "lucide-react"
 import Link from "next/link"
-import { createBrowserClient } from "@supabase/ssr"
 
 interface UserData {
   email: string
@@ -36,6 +35,7 @@ interface UserData {
 interface ActivityData {
   timestamp: string
   activity: string
+  type?: string
 }
 
 interface Task {
@@ -46,18 +46,9 @@ interface Task {
   completed: boolean
 }
 
-const convertToRupees = (dollars: number): string => {
-  const rupees = dollars * 83
-  return new Intl.NumberFormat("en-IN", {
-    style: "currency",
-    currency: "INR",
-    minimumFractionDigits: 0,
-  }).format(rupees)
-}
-
 export default function DashboardPage() {
   const [userData, setUserData] = useState<UserData | null>(null)
-  const [activityData, setActivityData] = useState<ActivityData[] | null>(null)
+  const [activityData, setActivityData] = useState<ActivityData[]>([])
   const [resumeCount, setResumeCount] = useState(0)
   const [interviewCount, setInterviewCount] = useState(0)
   const [loading, setLoading] = useState(true)
@@ -65,39 +56,33 @@ export default function DashboardPage() {
   const [newTask, setNewTask] = useState("")
   const [newTaskDueDate, setNewTaskDueDate] = useState("")
 
-  const supabase = createBrowserClient(
-    process.env.NEXT_PUBLIC_SUPABASE_URL || "",
-    process.env.NEXT_PUBLIC_SUPABASE_ANON_KEY || "",
-  )
-
   useEffect(() => {
-    const initializeDashboard = async () => {
+    const initializeDashboard = () => {
       try {
         const storedUser = localStorage.getItem("currentUser")
         if (storedUser) {
           const user = JSON.parse(storedUser)
           setUserData(user)
 
-          const { data: allResumes } = await supabase.from("resumes").select("id").eq("user_id", user.id)
-          setResumeCount(allResumes?.length || 0)
-
-          try {
-            const { data: interviews } = await supabase.from("mock_interviews").select("id").eq("user_id", user.id)
-            setInterviewCount(interviews?.length || 0)
-          } catch {
-            const localInterviews = JSON.parse(localStorage.getItem("interviewSessions") || "[]")
-            setInterviewCount(localInterviews.length)
+          const activityKey = `userActivity_${user.email}`
+          const storedActivity = localStorage.getItem(activityKey)
+          if (storedActivity) {
+            setActivityData(JSON.parse(storedActivity))
           }
-        }
 
-        const storedActivity = localStorage.getItem("userActivity")
-        if (storedActivity) {
-          setActivityData(JSON.parse(storedActivity))
-        }
+          const resumes = JSON.parse(localStorage.getItem("resumes") || "[]")
+          const userResumes = resumes.filter((r: any) => r.userEmail === user.email)
+          setResumeCount(userResumes.length)
 
-        const storedTasks = localStorage.getItem("userTasks")
-        if (storedTasks) {
-          setTasks(JSON.parse(storedTasks))
+          const interviews = JSON.parse(localStorage.getItem("interviewSessions") || "[]")
+          const userInterviews = interviews.filter((i: any) => i.userEmail === user.email)
+          setInterviewCount(userInterviews.length)
+
+          const taskKey = `userTasks_${user.email}`
+          const storedTasks = localStorage.getItem(taskKey)
+          if (storedTasks) {
+            setTasks(JSON.parse(storedTasks))
+          }
         }
       } catch (error) {
         console.log("[v0] Error initializing dashboard:", error)
@@ -110,7 +95,7 @@ export default function DashboardPage() {
   }, [])
 
   const handleAddTask = () => {
-    if (newTask.trim()) {
+    if (newTask.trim() && userData) {
       const task: Task = {
         id: Date.now().toString(),
         title: newTask,
@@ -120,22 +105,27 @@ export default function DashboardPage() {
       }
       const updatedTasks = [...tasks, task]
       setTasks(updatedTasks)
-      localStorage.setItem("userTasks", JSON.stringify(updatedTasks))
+      const taskKey = `userTasks_${userData.email}`
+      localStorage.setItem(taskKey, JSON.stringify(updatedTasks))
       setNewTask("")
       setNewTaskDueDate("")
     }
   }
 
   const handleDeleteTask = (taskId: string) => {
+    if (!userData) return
     const updatedTasks = tasks.filter((t) => t.id !== taskId)
     setTasks(updatedTasks)
-    localStorage.setItem("userTasks", JSON.stringify(updatedTasks))
+    const taskKey = `userTasks_${userData.email}`
+    localStorage.setItem(taskKey, JSON.stringify(updatedTasks))
   }
 
   const handleToggleTask = (taskId: string) => {
+    if (!userData) return
     const updatedTasks = tasks.map((t) => (t.id === taskId ? { ...t, completed: !t.completed } : t))
     setTasks(updatedTasks)
-    localStorage.setItem("userTasks", JSON.stringify(updatedTasks))
+    const taskKey = `userTasks_${userData.email}`
+    localStorage.setItem(taskKey, JSON.stringify(updatedTasks))
   }
 
   const getInitials = (name: string | undefined) => {
@@ -225,7 +215,7 @@ export default function DashboardPage() {
             <CardContent>
               <div className="space-y-4" id="activity-list">
                 {activityData && activityData.length > 0 ? (
-                  activityData.map((activity, index) => (
+                  activityData.slice(0, 10).map((activity, index) => (
                     <div key={index} className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
                       <FileText className="w-5 h-5 text-blue-600" />
                       <div className="flex-1">
@@ -235,13 +225,17 @@ export default function DashboardPage() {
                             year: "numeric",
                             month: "long",
                             day: "numeric",
+                            hour: "2-digit",
+                            minute: "2-digit",
                           })}
                         </p>
                       </div>
                     </div>
                   ))
                 ) : (
-                  <p className="text-gray-600 text-sm">No recent activity</p>
+                  <p className="text-gray-600 text-sm">
+                    No recent activity. Start by creating a resume or practicing interviews!
+                  </p>
                 )}
               </div>
             </CardContent>
@@ -299,9 +293,9 @@ export default function DashboardPage() {
               <div className="mt-4 space-y-2">
                 <div className="flex justify-between text-sm">
                   <span>Progress</span>
-                  <span>40%</span>
+                  <span>{Math.min(40 + resumeCount * 10 + interviewCount * 15, 100)}%</span>
                 </div>
-                <Progress value={40} className="h-2" />
+                <Progress value={Math.min(40 + resumeCount * 10 + interviewCount * 15, 100)} className="h-2" />
               </div>
             </CardContent>
           </Card>

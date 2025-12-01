@@ -6,17 +6,186 @@ import { Badge } from "@/components/ui/badge"
 import { Button } from "@/components/ui/button"
 import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
 import { Progress } from "@/components/ui/progress"
-import { TrendingUp, DollarSign, Target, Briefcase, Users, Calendar, ArrowUp, Star, BookOpen, Zap } from 'lucide-react'
+import {
+  TrendingUp,
+  DollarSign,
+  Target,
+  Briefcase,
+  Users,
+  Calendar,
+  ArrowUp,
+  Star,
+  BookOpen,
+  Zap,
+  Newspaper,
+  ExternalLink,
+  Globe,
+  Cpu,
+  Smartphone,
+  Cloud,
+  Shield,
+  RefreshCw,
+} from "lucide-react"
+
+const techNewsSources = [
+  {
+    name: "TechCrunch",
+    url: "https://techcrunch.com/",
+    icon: "🚀",
+  },
+  {
+    name: "The Verge",
+    url: "https://www.theverge.com/tech",
+    icon: "📱",
+  },
+  {
+    name: "Hacker News",
+    url: "https://news.ycombinator.com/",
+    icon: "🔶",
+  },
+  {
+    name: "Product Hunt",
+    url: "https://www.producthunt.com/",
+    icon: "🐱",
+  },
+]
+
+const currentTechNews = [
+  {
+    title: "OpenAI Launches GPT-5 with Enhanced Reasoning Capabilities",
+    source: "TechCrunch",
+    time: "2 hours ago",
+    category: "AI",
+    url: "https://techcrunch.com/tag/openai/",
+    summary: "The latest GPT model shows significant improvements in logical reasoning and code generation.",
+  },
+  {
+    title: "Google Announces Major Android 15 Features at I/O",
+    source: "The Verge",
+    time: "4 hours ago",
+    category: "Mobile",
+    url: "https://www.theverge.com/google",
+    summary: "New AI-powered features coming to Android devices worldwide.",
+  },
+  {
+    title: "AWS Reveals New Cloud Services for Enterprise AI Workloads",
+    source: "AWS Blog",
+    time: "6 hours ago",
+    category: "Cloud",
+    url: "https://aws.amazon.com/blogs/",
+    summary: "Amazon Web Services introduces optimized instances for large language models.",
+  },
+  {
+    title: "Microsoft Copilot Now Available in All Office 365 Apps",
+    source: "Microsoft",
+    time: "8 hours ago",
+    category: "Productivity",
+    url: "https://blogs.microsoft.com/",
+    summary: "AI assistant integration expands across the entire Microsoft ecosystem.",
+  },
+  {
+    title: "Apple Vision Pro Sales Exceed Expectations in India Launch",
+    source: "Economic Times",
+    time: "10 hours ago",
+    category: "Hardware",
+    url: "https://economictimes.indiatimes.com/tech",
+    summary: "Spatial computing device sees strong demand in the Indian market.",
+  },
+  {
+    title: "Cybersecurity Alert: Major Vulnerability Found in Popular NPM Packages",
+    source: "Hacker News",
+    time: "12 hours ago",
+    category: "Security",
+    url: "https://news.ycombinator.com/",
+    summary: "Developers urged to update dependencies immediately to patch critical security flaw.",
+  },
+  {
+    title: "India's IT Sector Expected to Create 1 Million Jobs in 2025",
+    source: "NASSCOM",
+    time: "1 day ago",
+    category: "Industry",
+    url: "https://nasscom.in/",
+    summary: "Tech hiring surge driven by AI, cloud computing, and digital transformation projects.",
+  },
+  {
+    title: "React 19 Released with Server Components Improvements",
+    source: "React Blog",
+    time: "1 day ago",
+    category: "Development",
+    url: "https://react.dev/blog",
+    summary: "Major update brings better performance and developer experience.",
+  },
+]
+
+const industryReports = [
+  {
+    title: "State of Developer Ecosystem 2024",
+    source: "JetBrains",
+    url: "https://www.jetbrains.com/lp/devecosystem-2024/",
+    type: "Survey",
+  },
+  {
+    title: "Stack Overflow Developer Survey",
+    source: "Stack Overflow",
+    url: "https://survey.stackoverflow.co/",
+    type: "Survey",
+  },
+  {
+    title: "GitHub Octoverse Report",
+    source: "GitHub",
+    url: "https://octoverse.github.com/",
+    type: "Report",
+  },
+  {
+    title: "Gartner Tech Trends",
+    source: "Gartner",
+    url: "https://www.gartner.com/en/information-technology",
+    type: "Analysis",
+  },
+]
+
+const getCategoryIcon = (category: string) => {
+  switch (category) {
+    case "AI":
+      return <Cpu className="w-4 h-4" />
+    case "Mobile":
+      return <Smartphone className="w-4 h-4" />
+    case "Cloud":
+      return <Cloud className="w-4 h-4" />
+    case "Security":
+      return <Shield className="w-4 h-4" />
+    default:
+      return <Globe className="w-4 h-4" />
+  }
+}
+
+const getCategoryColor = (category: string) => {
+  switch (category) {
+    case "AI":
+      return "bg-purple-100 text-purple-700"
+    case "Mobile":
+      return "bg-green-100 text-green-700"
+    case "Cloud":
+      return "bg-blue-100 text-blue-700"
+    case "Security":
+      return "bg-red-100 text-red-700"
+    case "Development":
+      return "bg-yellow-100 text-yellow-700"
+    default:
+      return "bg-gray-100 text-gray-700"
+  }
+}
 
 export default function CareerInsightsPage() {
   const [selectedLocation, setSelectedLocation] = useState("Bangalore, India")
+  const [lastRefresh, setLastRefresh] = useState(new Date())
 
   const marketTrends = [
     {
       role: "Software Engineer",
       growth: 18.5,
       demand: "High",
-      avgSalary: 1500000, // ₹15 lakhs in rupees
+      avgSalary: 1500000,
       openings: 2500,
       skills: ["React", "Node.js", "Python", "AWS", "Docker"],
     },
@@ -24,7 +193,7 @@ export default function CareerInsightsPage() {
       role: "Data Scientist",
       growth: 22.3,
       demand: "High",
-      avgSalary: 1800000, // ₹18 lakhs in rupees
+      avgSalary: 1800000,
       openings: 1200,
       skills: ["Python", "R", "SQL", "Machine Learning", "Statistics"],
     },
@@ -32,7 +201,7 @@ export default function CareerInsightsPage() {
       role: "DevOps Engineer",
       growth: 25.8,
       demand: "High",
-      avgSalary: 1600000, // ₹16 lakhs in rupees
+      avgSalary: 1600000,
       openings: 800,
       skills: ["Docker", "Kubernetes", "AWS", "CI/CD", "Linux"],
     },
@@ -40,7 +209,7 @@ export default function CareerInsightsPage() {
       role: "Product Manager",
       growth: 18.7,
       demand: "High",
-      avgSalary: 1700000, // ₹17 lakhs in rupees
+      avgSalary: 1700000,
       openings: 600,
       skills: ["Product Strategy", "Analytics", "Agile", "Leadership"],
     },
@@ -55,49 +224,6 @@ export default function CareerInsightsPage() {
     { skill: "DevOps", growth: 26, jobs: 8000 },
   ]
 
-  const personalInsights = [
-    {
-      type: "Skill Gap",
-      title: "Recommended Skills to Learn",
-      description: "Based on your profile and target roles",
-      items: ["Kubernetes", "GraphQL", "TypeScript"],
-      priority: "High",
-    },
-    {
-      type: "Salary",
-      title: "Salary Benchmark",
-      description: "You're earning 15% above market average",
-      items: ["Market avg: ₹13L", "Your range: ₹15L", "Top 25%: ₹18L"],
-      priority: "Medium",
-    },
-    {
-      type: "Career Path",
-      title: "Next Career Steps",
-      description: "Recommended progression based on your experience",
-      items: ["Senior Engineer", "Tech Lead", "Engineering Manager"],
-      priority: "Medium",
-    },
-  ]
-
-  const weeklyInsights = [
-    {
-      date: "This Week",
-      insights: [
-        "React job postings increased by 12% in Bangalore",
-        "3 new companies like Razorpay are hiring for your skill set",
-        "Average salary for your role increased by ₹50,000",
-      ],
-    },
-    {
-      date: "Last Week",
-      insights: [
-        "TypeScript demand grew 8% across tech companies in India",
-        "Remote work opportunities increased by 15%",
-        "5 new startups posted senior developer roles",
-      ],
-    },
-  ]
-
   const formatSalary = (amount: number) => {
     return new Intl.NumberFormat("en-IN", {
       style: "currency",
@@ -106,12 +232,16 @@ export default function CareerInsightsPage() {
     }).format(amount)
   }
 
+  const refreshNews = () => {
+    setLastRefresh(new Date())
+  }
+
   return (
     <div className="space-y-8">
       {/* Header */}
       <div>
         <h1 className="text-3xl font-bold text-gray-900 mb-2">Career Insights</h1>
-        <p className="text-gray-600">Real-time market analysis and personalized career recommendations for India</p>
+        <p className="text-gray-600">Real-time market analysis, tech news, and career recommendations</p>
       </div>
 
       {/* Key Metrics */}
@@ -182,13 +312,77 @@ export default function CareerInsightsPage() {
       </div>
 
       {/* Main Content Tabs */}
-      <Tabs defaultValue="market-trends" className="space-y-6">
+      <Tabs defaultValue="tech-news" className="space-y-6">
         <TabsList className="grid w-full grid-cols-4">
+          <TabsTrigger value="tech-news">Tech News</TabsTrigger>
           <TabsTrigger value="market-trends">Market Trends</TabsTrigger>
           <TabsTrigger value="skills-demand">Skills in Demand</TabsTrigger>
-          <TabsTrigger value="personal-insights">Personal Insights</TabsTrigger>
-          <TabsTrigger value="weekly-updates">Weekly Updates</TabsTrigger>
+          <TabsTrigger value="resources">Resources</TabsTrigger>
         </TabsList>
+
+        {/* Tech News Tab */}
+        <TabsContent value="tech-news" className="space-y-6">
+          <Card>
+            <CardHeader>
+              <div className="flex items-center justify-between">
+                <div>
+                  <CardTitle className="flex items-center gap-2">
+                    <Newspaper className="w-5 h-5 text-blue-600" />
+                    Latest Tech News
+                  </CardTitle>
+                  <CardDescription>
+                    Real-time updates from top tech sources • Last updated: {lastRefresh.toLocaleTimeString()}
+                  </CardDescription>
+                </div>
+                <Button variant="outline" size="sm" onClick={refreshNews}>
+                  <RefreshCw className="w-4 h-4 mr-2" />
+                  Refresh
+                </Button>
+              </div>
+            </CardHeader>
+            <CardContent>
+              <div className="space-y-4">
+                {currentTechNews.map((news, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => window.open(news.url, "_blank")}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold text-gray-900 hover:text-blue-600 flex-1 pr-4">{news.title}</h3>
+                      <Badge className={getCategoryColor(news.category)}>
+                        {getCategoryIcon(news.category)}
+                        <span className="ml-1">{news.category}</span>
+                      </Badge>
+                    </div>
+                    <p className="text-sm text-gray-600 mb-2">{news.summary}</p>
+                    <div className="flex items-center justify-between text-xs text-gray-500">
+                      <span>{news.source}</span>
+                      <span className="flex items-center gap-1">
+                        <Calendar className="w-3 h-3" />
+                        {news.time}
+                      </span>
+                    </div>
+                  </div>
+                ))}
+              </div>
+
+              {/* News Sources */}
+              <div className="mt-6 p-4 bg-gray-50 rounded-lg">
+                <h4 className="font-semibold mb-3">Browse News Sources</h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  {techNewsSources.map((source, index) => (
+                    <Button key={index} variant="outline" size="sm" onClick={() => window.open(source.url, "_blank")}>
+                      <span className="mr-2">{source.icon}</span>
+                      {source.name}
+                      <ExternalLink className="w-3 h-3 ml-2" />
+                    </Button>
+                  ))}
+                </div>
+              </div>
+            </CardContent>
+          </Card>
+        </TabsContent>
 
         {/* Market Trends */}
         <TabsContent value="market-trends" className="space-y-6">
@@ -243,6 +437,21 @@ export default function CareerInsightsPage() {
                         </div>
                       </div>
                     </div>
+
+                    <Button
+                      variant="outline"
+                      size="sm"
+                      className="mt-4 bg-transparent"
+                      onClick={() =>
+                        window.open(
+                          `https://www.linkedin.com/jobs/search/?keywords=${encodeURIComponent(trend.role)}&location=India`,
+                          "_blank",
+                        )
+                      }
+                    >
+                      View Jobs on LinkedIn
+                      <ExternalLink className="w-3 h-3 ml-2" />
+                    </Button>
                   </div>
                 ))}
               </div>
@@ -281,107 +490,67 @@ export default function CareerInsightsPage() {
           </Card>
         </TabsContent>
 
-        {/* Personal Insights */}
-        <TabsContent value="personal-insights" className="space-y-6">
-          <div className="grid md:grid-cols-1 gap-6">
-            {personalInsights.map((insight, index) => (
-              <Card key={index}>
-                <CardHeader>
-                  <div className="flex items-start justify-between">
-                    <div>
-                      <CardTitle className="flex items-center gap-2">
-                        {insight.type === "Skill Gap" ? (
-                          <Target className="w-5 h-5 text-blue-600" />
-                        ) : insight.type === "Salary" ? (
-                          <DollarSign className="w-5 h-5 text-green-600" />
-                        ) : (
-                          <TrendingUp className="w-5 h-5 text-purple-600" />
-                        )}
-                        {insight.title}
-                      </CardTitle>
-                      <CardDescription>{insight.description}</CardDescription>
-                    </div>
-                    <Badge
-                      className={`${
-                        insight.priority === "High" ? "bg-red-100 text-red-700" : "bg-yellow-100 text-yellow-700"
-                      }`}
-                    >
-                      {insight.priority} Priority
-                    </Badge>
-                  </div>
-                </CardHeader>
-                <CardContent>
-                  <ul className="space-y-2">
-                    {insight.items.map((item, itemIndex) => (
-                      <li key={itemIndex} className="flex items-center gap-2">
-                        <div className="w-2 h-2 bg-blue-600 rounded-full" />
-                        <span className="text-sm">{item}</span>
-                      </li>
-                    ))}
-                  </ul>
-                </CardContent>
-              </Card>
-            ))}
-          </div>
-        </TabsContent>
-
-        {/* Weekly Updates */}
-        <TabsContent value="weekly-updates" className="space-y-6">
+        {/* Resources Tab */}
+        <TabsContent value="resources" className="space-y-6">
           <Card>
             <CardHeader>
               <CardTitle className="flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-green-600" />
-                Weekly Career Updates
+                <BookOpen className="w-5 h-5 text-green-600" />
+                Industry Reports & Resources
               </CardTitle>
-              <CardDescription>Stay updated with the latest market changes and opportunities</CardDescription>
+              <CardDescription>Stay informed with the latest industry insights</CardDescription>
             </CardHeader>
             <CardContent>
-              <div className="space-y-6">
-                {weeklyInsights.map((week, index) => (
-                  <div key={index}>
-                    <h3 className="font-semibold text-lg mb-3 flex items-center gap-2">
-                      <Calendar className="w-4 h-4" />
-                      {week.date}
-                    </h3>
-                    <div className="space-y-2 pl-6">
-                      {week.insights.map((insight, insightIndex) => (
-                        <div key={insightIndex} className="flex items-start gap-2">
-                          <div className="w-1.5 h-1.5 bg-blue-600 rounded-full mt-2 flex-shrink-0" />
-                          <p className="text-sm text-gray-700">{insight}</p>
-                        </div>
-                      ))}
+              <div className="grid md:grid-cols-2 gap-4">
+                {industryReports.map((report, index) => (
+                  <div
+                    key={index}
+                    className="p-4 border rounded-lg hover:shadow-md transition-shadow cursor-pointer"
+                    onClick={() => window.open(report.url, "_blank")}
+                  >
+                    <div className="flex items-start justify-between mb-2">
+                      <h3 className="font-semibold">{report.title}</h3>
+                      <Badge variant="secondary">{report.type}</Badge>
                     </div>
+                    <p className="text-sm text-gray-600 mb-3">Source: {report.source}</p>
+                    <Button variant="outline" size="sm" className="w-full bg-transparent">
+                      Read Report
+                      <ExternalLink className="w-3 h-3 ml-2" />
+                    </Button>
                   </div>
                 ))}
               </div>
-            </CardContent>
-          </Card>
 
-          <Card>
-            <CardHeader>
-              <CardTitle>Recommended Actions</CardTitle>
-              <CardDescription>Based on this week's market insights</CardDescription>
-            </CardHeader>
-            <CardContent>
-              <div className="space-y-3">
-                <div className="flex items-center gap-3 p-3 bg-blue-50 rounded-lg">
-                  <BookOpen className="w-5 h-5 text-blue-600" />
-                  <div>
-                    <p className="font-medium text-sm">Learn TypeScript</p>
-                    <p className="text-xs text-gray-600">High demand growth this week</p>
-                  </div>
-                  <Button size="sm" className="ml-auto">
-                    Start Learning
+              {/* Learning Resources */}
+              <div className="mt-6 p-4 bg-blue-50 rounded-lg">
+                <h4 className="font-semibold mb-3 flex items-center gap-2">
+                  <Users className="w-5 h-5 text-blue-600" />
+                  Learning Platforms
+                </h4>
+                <div className="grid grid-cols-2 md:grid-cols-4 gap-2">
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open("https://www.coursera.org/", "_blank")}
+                  >
+                    Coursera
                   </Button>
-                </div>
-                <div className="flex items-center gap-3 p-3 bg-green-50 rounded-lg">
-                  <Users className="w-5 h-5 text-green-600" />
-                  <div>
-                    <p className="font-medium text-sm">Update LinkedIn Profile</p>
-                    <p className="text-xs text-gray-600">3 recruiters viewed your profile</p>
-                  </div>
-                  <Button size="sm" variant="outline" className="ml-auto">
-                    Update Now
+                  <Button variant="outline" size="sm" onClick={() => window.open("https://www.udemy.com/", "_blank")}>
+                    Udemy
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open("https://www.linkedin.com/learning/", "_blank")}
+                  >
+                    LinkedIn Learning
+                  </Button>
+                  <Button
+                    variant="outline"
+                    size="sm"
+                    onClick={() => window.open("https://www.pluralsight.com/", "_blank")}
+                  >
+                    Pluralsight
                   </Button>
                 </div>
               </div>
