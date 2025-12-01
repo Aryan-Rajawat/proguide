@@ -8,20 +8,6 @@
     "lint": "next lint",
     "start": "next start"
   },
-  "resolutions": {
-    "@ai-sdk/openai": "1.1.9",
-    "@supabase/ssr": "0.5.2",
-    "@supabase/supabase-js": "2.46.2",
-    "ai": "3.4.33",
-    "zod": "3.23.8"
-  },
-  "overrides": {
-    "@ai-sdk/openai": "1.1.9",
-    "@supabase/ssr": "0.5.2",
-    "@supabase/supabase-js": "2.46.2",
-    "ai": "3.4.33",
-    "zod": "3.23.8"
-  },
   "dependencies": {
     "@ai-sdk/openai": "latest",
     "@hookform/resolvers": "^3.9.1",
@@ -84,14 +70,5 @@
     "postcss": "^8.5",
     "tailwindcss": "^3.4.17",
     "typescript": "^5"
-  },
-  "pnpm": {
-    "overrides": {
-      "@ai-sdk/openai": "1.1.9",
-      "@supabase/ssr": "0.5.2",
-      "@supabase/supabase-js": "2.46.2",
-      "ai": "3.4.33",
-      "zod": "3.23.8"
-    }
   }
 }
